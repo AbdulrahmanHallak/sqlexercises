@@ -1,0 +1,13 @@
+@model List<string>
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Categories
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="categoriesDropdown">
+        @foreach (var category in Model)
+        {
+            <li><a class="dropdown-item" href="#">@category</a></li>
+        }
+    </ul>
+</li> 
