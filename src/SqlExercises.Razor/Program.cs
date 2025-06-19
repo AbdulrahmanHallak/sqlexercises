@@ -1,7 +1,18 @@
+using SqlExercises.Razor;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+builder.Configuration.AddEnvironmentVariables();
+var connString =
+    builder.Configuration.GetConnectionString("Postgres")
+    ?? throw new InvalidOperationException("Connection string cannot be null");
+
+builder.Services.AddSingleton<ConnectionString>(_ => new ConnectionString(connString));
+builder.Services.AddSingleton<DapperContext>();
+
+Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
 var app = builder.Build();
 
