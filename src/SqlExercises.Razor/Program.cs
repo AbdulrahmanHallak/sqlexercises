@@ -9,6 +9,12 @@ var connString =
     builder.Configuration.GetConnectionString("Postgres")
     ?? throw new InvalidOperationException("Connection string cannot be null");
 
+builder.Services.Configure<RouteOptions>(opts =>
+{
+    opts.LowercaseQueryStrings = true;
+    opts.LowercaseUrls = true;
+});
+
 builder.Services.AddSingleton<ConnectionString>(_ => new ConnectionString(connString));
 builder.Services.AddSingleton<DapperContext>();
 
