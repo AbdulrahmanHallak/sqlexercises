@@ -1,11 +1,8 @@
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using SqlExercises.Razor;
 
 namespace SqlExercises.Razor.Pages.Categories.Exercises
 {
@@ -19,7 +16,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
         }
 
         [BindProperty]
-        public ExerciseViewModel Exercise { get; set; } = new();
+        public ExerciseDto Exercise { get; set; } = new();
 
         [BindProperty]
         public string? NewCategory { get; set; }
@@ -34,10 +31,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
             using var connection = _context.CreateConnection();
             var sql =
                 "SELECT id, question, solution, answer, hint, category_id FROM exercise WHERE id = @id;";
-            var exercise = await connection.QuerySingleOrDefaultAsync<ExerciseViewModel>(
-                sql,
-                new { id }
-            );
+            var exercise = await connection.QuerySingleOrDefaultAsync<ExerciseDto>(sql, new { id });
             if (exercise == null)
                 return NotFound();
             Exercise = exercise;
@@ -90,17 +84,23 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
             }
         }
 
-        public class ExerciseViewModel
+        public class ExerciseDto
         {
             public int Id { get; set; }
 
             [Required]
-            public string Question { get; set; }
+            public string Title { get; set; } = default!;
 
             [Required]
-            public string Solution { get; set; }
-            public string Answer { get; set; }
-            public string Hint { get; set; }
+            public string Question { get; set; } = default!;
+
+            [Required]
+            public string Solution { get; set; } = default!;
+
+            [Required]
+            public string Answer { get; set; } = default!;
+
+            public string? Hint { get; set; }
 
             [Required]
             [Display(Name = "Category")]
@@ -110,7 +110,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
         public class CategoryDto
         {
             public int Id { get; set; }
-            public string Name { get; set; }
+            public string Name { get; set; } = default!;
         }
     }
 }

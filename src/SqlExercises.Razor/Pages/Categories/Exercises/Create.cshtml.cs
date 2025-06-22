@@ -80,6 +80,9 @@ public class CreateModel(DapperContext context) : PageModel
     public class ExerciseDto
     {
         [Required]
+        public string Title { get; set; } = default!;
+
+        [Required]
         public string Question { get; set; } = default!;
 
         [Required]

@@ -6,6 +6,11 @@
 <h2>Create Exercise</h2>
 <form method="post">
     <div class="mb-3">
+        <label asp-for="Exercise.Title" class="form-label"></label>
+        <textarea asp-for="Exercise.Title" class="form-control"></textarea>
+        <span asp-validation-for="Exercise.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
         <label asp-for="Exercise.Question" class="form-label"></label>
         <textarea asp-for="Exercise.Question" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Question" class="text-danger"></span>
