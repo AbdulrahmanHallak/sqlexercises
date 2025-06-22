@@ -15,15 +15,15 @@ public class ExerciseModel(DapperContext context) : PageModel
     public int Id { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public string Category { get; set; }
+    public string Category { get; set; } = default!;
 
     public ExerciseDto Exercise { get; set; } = default!;
-    public IEnumerable<dynamic> ExpectedResult { get; set; }
+    public IEnumerable<dynamic> ExpectedResult { get; set; } = default!;
 
     // For POST
 
     [BindProperty]
-    public string PostedSolution { get; set; }
+    public string PostedSolution { get; set; } = default!;
 
     public async Task<IActionResult> OnGet()
     {

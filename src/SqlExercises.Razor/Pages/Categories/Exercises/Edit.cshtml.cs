@@ -6,14 +6,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SqlExercises.Razor.Pages.Categories.Exercises
 {
-    public class EditModel : PageModel
+    public class EditModel(DapperContext context) : PageModel
     {
-        private readonly DapperContext _context;
-
-        public EditModel(DapperContext context)
-        {
-            _context = context;
-        }
+        private readonly DapperContext _context = context;
 
         [BindProperty]
         public ExerciseDto Exercise { get; set; } = new();
@@ -22,7 +17,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
         public string? NewCategory { get; set; }
 
         [BindProperty(SupportsGet = true)]
-        public string Category { get; set; }
+        public string Category { get; set; } = default!;
 
         public List<SelectListItem> CategoryOptions { get; set; } = new();
 
