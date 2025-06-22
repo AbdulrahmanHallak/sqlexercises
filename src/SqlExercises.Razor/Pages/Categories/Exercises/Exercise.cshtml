@@ -1,0 +1,115 @@
+@page "/Categories/{category:alpha}/Exercises/{id:int}"
+@model ExerciseModel
+@{
+    ViewData["Title"] = "Exercise";
+}
+<div class="container mt-4">
+    <h2>Exercise</h2>
+    <p>@Model.Exercise.Question</p>
+    <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#erdCollapse"
+        aria-expanded="false" aria-controls="erdCollapse">
+        Show/Hide ERD
+    </button>
+    <div class="collapse mb-3" id="erdCollapse">
+        <img src="/images/erd.png" alt="ERD" class="img-fluid border" />
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <label for="sqlInput" class="form-label">Your SQL:</label>
+            <textarea id="sqlInput" class="form-control" rows="6"></textarea>
+            <button id="runQueryBtn" class="btn btn-primary mt-2">Run</button>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">Expected Results:</label>
+            <div id="expectedResultsBox" style="min-height: 60px; max-height: 300px; overflow-y: auto; overflow-x: auto;">
+                @if (Model.ExpectedResult != null && Model.ExpectedResult.Any())
+                {
+                    <text>@Html.Raw(RenderTable(Model.ExpectedResult))</text>
+                }
+                else
+                {
+                    <em>No expected results.</em>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="mt-3">
+        <label class="form-label">Results <span id="correctnessLabel"></span></label>
+        <div id="resultsBox" class="bg-white border p-2" style="min-height: 60px; max-height: 300px; overflow-y: auto; overflow-x: auto;">(Results will
+            appear here)</div>
+    </div>
+    <div class="mt-4">
+        <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#solutionCollapse"
+            aria-expanded="false" aria-controls="solutionCollapse" id="showSolutionBtn">
+            Show Solution
+        </button>
+        <div class="collapse" id="solutionCollapse">
+            <div class="card card-body mt-2">
+                <strong>Solution:</strong>
+                <pre>@Model.Exercise.Solution</pre>
+                <strong>Explanation:</strong>
+                <p>@Model.Exercise.Answer</p>
+            </div>
+        </div>
+    </div>
+</div>
+@functions {
+    private string RenderTable(IEnumerable<dynamic> data)
+    {
+        var list = data.Select(row => (IDictionary<string, object>)row).ToList();
+        if (!list.Any()) return "<em>No results.</em>";
+        var cols = list.First().Keys.ToList();
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<table class='table table-bordered table-sm mb-0'><thead><tr>");
+        foreach (var col in cols) sb.Append($"<th>{col}</th>");
+        sb.Append("</tr></thead><tbody>");
+        foreach (var row in list)
+        {
+            sb.Append("<tr>");
+            foreach (var col in cols) sb.Append($"<td>{row[col]}</td>");
+            sb.Append("</tr>");
+        }
+        sb.Append("</tbody></table>");
+        return sb.ToString();
+    }
+}
+@section Scripts {
+    <script>
+        function renderTable(data) {
+            if (!Array.isArray(data) || data.length === 0) return '<em>No results.</em>';
+            let cols = Object.keys(data[0]);
+            let thead = '<thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+            let tbody = '<tbody>' + data.map(row => '<tr>' + cols.map(c => `<td>${row[c]}</td>`).join('') + '</tr>').join('') + '</tbody>';
+            return `<table class="table table-bordered table-sm mb-0">${thead}${tbody}</table>`;
+        }
+        document.getElementById('runQueryBtn').addEventListener('click', async function () {
+            const sql = document.getElementById('sqlInput').value.trim();
+            const resultsBox = document.getElementById('resultsBox');
+            const correctnessLabel = document.getElementById('correctnessLabel');
+            resultsBox.innerHTML = '<em>Loading...</em>';
+            correctnessLabel.innerHTML = '';
+            try {
+                const formData = new FormData();
+                formData.append('PostedSolution', sql);
+                const response = await fetch(window.location.pathname, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.result && typeof data.result === 'string' && data.result.startsWith('ERROR')) {
+                    resultsBox.innerHTML = `<span class='text-danger'>${data.result}</span>`;
+                } else if (data.result && Array.isArray(data.result)) {
+                    resultsBox.innerHTML = renderTable(data.result);
+                } else {
+                    resultsBox.innerHTML = data.result;
+                }
+                if (typeof data.isEqual !== 'undefined') {
+                    correctnessLabel.innerHTML = `<span class='${data.isEqual ? 'text-success' : 'text-danger'}'>${data.isEqual ? 'Correct' : 'Incorrect'}</span>`;
+                }
+            } catch (err) {
+                resultsBox.innerHTML = `<span class='text-danger'>${err}</span>`;
+                correctnessLabel.innerHTML = '';
+            }
+        });
+    </script>
+}

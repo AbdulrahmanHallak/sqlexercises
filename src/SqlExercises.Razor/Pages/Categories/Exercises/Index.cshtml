@@ -10,7 +10,9 @@
     {
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>
-                <a asp-page="/Categories/Exercises" asp-route-category="@Model.Category" asp-route-id="@ex.Id">
+                <a asp-page="/Categories/Exercises/Exercise"
+                   asp-route-category="@Model.Category"
+                   asp-route-id="@ex.Id">
                     @ex.Question
                 </a>
 
