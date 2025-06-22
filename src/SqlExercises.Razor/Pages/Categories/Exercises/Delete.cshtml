@@ -12,7 +12,7 @@
         <dt class="col-sm-2">Category</dt>
         <dd class="col-sm-10">@Model.Exercise.CategoryName</dd>
     </dl>
-    <form method="post">
+    <form method="post" asp-route-category="@RouteData.Values["category"]">
         <button type="submit" class="btn btn-danger">Delete</button>
         <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
     </form>

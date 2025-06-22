@@ -21,15 +21,12 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int id)
+        public async Task<IActionResult> OnPostAsync(int id, string category)
         {
             using var connection = _context.CreateConnection();
             var sql = "DELETE FROM exercise WHERE id = @id;";
             await connection.ExecuteAsync(sql, new { id });
-            return RedirectToPage(
-                "/Categories/Exercises",
-                new { category = Exercise.CategoryName }
-            );
+            return RedirectToPage("/Categories/Exercises/Index", new { category });
         }
 
         public class ExerciseDto
