@@ -5,7 +5,10 @@
 }
 
 <h2>Categories</h2>
-<a asp-page="/Categories/Exercises/Create" class="btn btn-success mb-3">Create New Category</a>
+@if (Model.IsAdmin)
+{
+    <a asp-page="/Categories/Exercises/Create" class="btn btn-success mb-3">Create New Category</a>
+}
 <ul class="list-group">
     @foreach (var category in Model.Categories)
     {

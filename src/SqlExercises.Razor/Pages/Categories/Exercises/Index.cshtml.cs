@@ -10,10 +10,16 @@ public class ExercisesModel(DapperContext context) : PageModel
     public string? Category { get; set; }
     public IReadOnlyCollection<ExerciseDto> Exercises { get; set; } = default!;
 
+    public bool IsAdmin { get; set; } = false;
+
     public async Task<IActionResult> OnGet(string category)
     {
         if (category is null)
             return NotFound();
+
+        Request.Cookies.TryGetValue("is_admin", out var isAdmin);
+        if (isAdmin == "true")
+            IsAdmin = true;
 
         using var connection = context.CreateConnection();
         var sql = """
