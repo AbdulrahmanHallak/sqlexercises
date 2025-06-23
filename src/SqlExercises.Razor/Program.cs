@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.DataProtection;
 using SqlExercises.Razor;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,18 @@ builder.Services.Configure<RouteOptions>(opts =>
     opts.LowercaseQueryStrings = true;
     opts.LowercaseUrls = true;
 });
+builder
+    .Services.AddDataProtection()
+    .PersistKeysToFileSystem(
+        new DirectoryInfo(
+            Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                ".aspnet",
+                "DataProtection-Keys"
+            )
+        )
+    )
+    .SetApplicationName("MyApp");
 
 builder.Services.AddSingleton<ConnectionString>(_ => new ConnectionString(connString));
 builder.Services.AddSingleton<DapperContext>();
