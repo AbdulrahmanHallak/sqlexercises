@@ -84,10 +84,9 @@ public class ExerciseModel(DapperContext context) : PageModel
         foreach (var row in typeSafe)
         {
             foreach (var column in row)
-            {
-                solString.Append($"{column.Key}{column.Value}");
-            }
+                solString.Append($"{column.Value}");
         }
+
         return solString.ToString();
     }
 
