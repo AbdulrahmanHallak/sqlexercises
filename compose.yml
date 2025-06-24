@@ -1,0 +1,38 @@
+services:
+  sqlexercises:
+    image: sqlexercises
+    build:
+      context: .
+      dockerfile: ./src/SqlExercises.Razor/Dockerfile
+      args:
+        UID: ${UID}
+
+    ports:
+      - 8080:8080
+    
+    networks:
+      - wrattel
+    volumes:
+      - ${HOME}/.aspnet/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+
+  db:
+    image: postgres:15-alpine
+    container_name: wrattel-db
+    ports:
+      - 3030:5432
+    volumes:
+      - wrattel-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=wrattel
+      - POSTGRES_PASSWORD=tls123dks
+    networks:
+      - wrattel
+
+networks:
+  wrattel:
+    name: wrattel-network
+    driver: bridge
+
+volumes:
+  wrattel-db:
+    name: wrattel-data
