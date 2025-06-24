@@ -24,10 +24,22 @@ public class IndexModel : PageModel
     {
         var adminSecret = Request.Form["adminSecret"].ToString();
         if (string.IsNullOrEmpty(adminSecret))
+        {
+            _logger.LogInformation(
+                "failed attempt to login as admin from {ip}",
+                Request.HttpContext.Connection.RemoteIpAddress
+            );
             return Page();
+        }
 
         if (adminSecret != AdminSecret)
+        {
+            _logger.LogInformation(
+                "failed attempt to login as admin from {ip}",
+                Request.HttpContext.Connection.RemoteIpAddress
+            );
             return Page();
+        }
 
         Response.Cookies.Append(
             "is_admin",

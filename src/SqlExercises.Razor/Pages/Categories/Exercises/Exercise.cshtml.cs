@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace SqlExercises.Razor.Pages.Categories.Exercises;
 
 [IgnoreAntiforgeryToken]
-public class ExerciseModel(DapperContext context) : PageModel
+public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context) : PageModel
 {
     // For GET
     [BindProperty(SupportsGet = true)]
@@ -34,12 +34,13 @@ public class ExerciseModel(DapperContext context) : PageModel
                 WHERE id = @id
             """;
         var result = await connection.QuerySingleAsync<ExerciseDto>(sql, new { id = Id });
-        var expectedResults = await connection.QueryAsync(result.Solution);
         if (result is null)
             return NotFound();
-
         Exercise = result;
+
+        var expectedResults = await connection.QueryAsync(result.Solution);
         ExpectedResult = expectedResults;
+
         return Page();
     }
 
@@ -59,10 +60,12 @@ public class ExerciseModel(DapperContext context) : PageModel
         IEnumerable<dynamic> resultRows;
         try
         {
+            logger.LogInformation("Executing sql solution:\n{solution}", PostedSolution);
             resultRows = await connection.QueryAsync(PostedSolution);
         }
         catch (Exception ex)
         {
+            logger.LogInformation("sql solution error:\n{Exception}:{Message}", ex, ex.Message);
             return new JsonResult(new { result = ex.Message, isEqual = false });
         }
         var resultString = StringifyDynamicList(resultRows);
