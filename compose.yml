@@ -9,7 +9,7 @@ services:
 
     ports:
       - 8080:8080
-    
+
     networks:
       - wrattel
     volumes:
@@ -28,6 +28,19 @@ services:
     networks:
       - wrattel
 
+  seq:
+    image: datalust/seq:latest
+    container_name: sqlexercises-seq
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=admin
+    ports:
+      - 5341:80
+    volumes:
+      - seq-data:/data
+    networks:
+      - wrattel
+
 networks:
   wrattel:
     name: wrattel-network
@@ -36,3 +49,5 @@ networks:
 volumes:
   wrattel-db:
     name: wrattel-data
+  seq-data:
+    name: seq-data
