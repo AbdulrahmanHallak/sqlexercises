@@ -5,6 +5,7 @@
 }
 <div class="container mt-4">
     <h2>@Model.Exercise.Title</h2>
+    <br>
     <p>@Model.Exercise.Question</p>
     <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#erdCollapse"
         aria-expanded="false" aria-controls="erdCollapse">
@@ -17,9 +18,19 @@
         <div class="col-md-6">
             <label for="sqlInput" class="form-label" style="display: block;">Your SQL:</label>
             <textarea id="sqlInput" class="sql-input"></textarea>
-            <div>
-                <button id="runQueryBtn" class="btn btn-primary mt-2">Run</button>
+            <div class="d-flex gap-2 mt-2">
+                <!-- Run and Hint buttons now side-by-side -->
+                <button id="runQueryBtn" class="btn btn-primary">Run</button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#hintModal">
+                    Show Hint
+                </button>
             </div>
+
+            <!-- Results box below buttons -->
+            <label class="form-label mt-3">Results <span id="correctnessLabel"></span></label>
+            <div id="resultsBox" class="bg-white border p-2"
+                style="min-height: 60px; max-height: 300px; overflow-y: auto; overflow-x: auto;">(Results will appear
+                here)</div>
         </div>
         <div class="col-md-6">
             <label class="form-label">Expected Results:</label>
@@ -53,15 +64,32 @@
                         </tbody>
                     </table>
                 }
-
             </div>
         </div>
     </div>
-    <div class="mt-3">
-        <label class="form-label">Results <span id="correctnessLabel"></span></label>
-        <div id="resultsBox" class="bg-white border p-2"
-            style="min-height: 60px; max-height: 300px; overflow-y: auto; overflow-x: auto;">(Results will
-            appear here)</div>
+    <!-- Hint Modal -->
+    <div class="modal fade" id="hintModal" tabindex="-1" aria-labelledby="hintModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="hintModalLabel">Hint</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if (!string.IsNullOrEmpty(Model.Exercise.Hint))
+                    {
+                        <p>@Model.Exercise.Hint</p>
+                    }
+                    else
+                    {
+                        <p>there is no hint</p>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="mt-4">
         <button class="btn btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#solutionCollapse"
