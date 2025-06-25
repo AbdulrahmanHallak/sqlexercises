@@ -4,7 +4,7 @@
     ViewData["Title"] = "Exercise";
 }
 <div class="container mt-4">
-    <h2>Exercise</h2>
+    <h2>@Model.Exercise.Title</h2>
     <p>@Model.Exercise.Question</p>
     <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#erdCollapse"
         aria-expanded="false" aria-controls="erdCollapse">
@@ -92,11 +92,11 @@
             ).join('');
 
             return `
-                            <table class="table table-bordered table-sm mb-0">
-                                <thead><tr>${headers}</tr></thead>
-                                <tbody>${rows}</tbody>
-                            </table>
-                        `;
+                                    <table class="table table-bordered table-sm mb-0">
+                                        <thead><tr>${headers}</tr></thead>
+                                        <tbody>${rows}</tbody>
+                                    </table>
+                                `;
         }
 
         document.getElementById('runQueryBtn').addEventListener('click', async () => {
