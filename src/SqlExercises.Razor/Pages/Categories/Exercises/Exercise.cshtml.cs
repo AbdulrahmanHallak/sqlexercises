@@ -30,7 +30,7 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
     {
         using var connection = context.CreateConnection();
         var sql = """
-                SELECT id, question, answer, hint, solution
+                SELECT id, question, answer, hint, solution, title
                 FROM exercise
                 WHERE id = @id
             """;
