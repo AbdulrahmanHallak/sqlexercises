@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Dapper;
 using K4os.Hash.xxHash;
@@ -18,7 +19,7 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
     public string Category { get; set; } = default!;
 
     public ExerciseDto Exercise { get; set; } = default!;
-    public IEnumerable<dynamic> ExpectedResult { get; set; } = default!;
+    public List<Dictionary<string, object>> ExpectedResult { get; set; } = default!;
 
     // For POST
 
@@ -39,7 +40,10 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
         Exercise = result;
 
         var expectedResults = await connection.QueryAsync(result.Solution);
-        ExpectedResult = expectedResults;
+        var typeSafe = expectedResults
+            .Select(row => new Dictionary<string, object>((IDictionary<string, object>)row))
+            .ToList();
+        ExpectedResult = typeSafe;
 
         return Page();
     }
@@ -50,7 +54,7 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
         using var connection = context.CreateConnection();
-        var sql = @"SELECT solution FROM exercise WHERE id = @id";
+        var sql = "SELECT solution FROM exercise WHERE id = @id";
         var solution = await connection.QuerySingleAsync<string>(sql, new { id = Id });
         var solutionResult = await connection.QueryAsync(solution);
         var solutionString = StringifyDynamicList(solutionResult);

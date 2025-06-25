@@ -8,8 +8,8 @@ public class ExercisesModel(DapperContext context) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string? Category { get; set; }
-    public IReadOnlyCollection<ExerciseDto> Exercises { get; set; } = default!;
 
+    public IReadOnlyCollection<ExerciseDto> Exercises { get; set; } = default!;
     public bool IsAdmin { get; set; } = false;
 
     public async Task<IActionResult> OnGet(string category)

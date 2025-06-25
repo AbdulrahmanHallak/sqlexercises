@@ -15,6 +15,7 @@ public class IndexModel(DapperContext context) : PageModel
         Request.Cookies.TryGetValue("is_admin", out var isAdmin);
         if (isAdmin == "true")
             IsAdmin = true;
+
         using var connection = context.CreateConnection();
         var sql = "SELECT name FROM category";
         var categories = await connection.QueryAsync<string>(sql);
