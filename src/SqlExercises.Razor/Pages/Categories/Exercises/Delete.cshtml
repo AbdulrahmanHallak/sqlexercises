@@ -14,6 +14,6 @@
     </dl>
     <form method="post" asp-route-category="@RouteData.Values["category"]">
         <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
+        <a asp-page="/Categories/Exercises/Index" asp-route-category="@RouteData.Values["category"]" class="btn btn-secondary">Cancel</a>
     </form>
 </div> 
