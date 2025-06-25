@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SqlExercises.Razor.Pages.Categories.Exercises;
 
@@ -11,70 +10,38 @@ public class CreateModel(DapperContext context) : PageModel
     [BindProperty]
     public ExerciseDto Exercise { get; set; } = default!;
 
-    [BindProperty]
-    public string? NewCategory { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public string Category { get; set; } = default!;
 
-    public List<SelectListItem> CategoryOptions { get; set; } = [];
+    public int CategoryId { get; set; }
 
-    public async Task OnGetAsync()
+    public async Task<IActionResult> OnGetAsync()
     {
-        await LoadCategories();
+        var sql = "SELECT id FROM category WHERE name like @category";
+        using var connection = context.CreateConnection();
+        var id = await connection.QueryFirstAsync<int?>(sql, new { Category });
+        if (id is null)
+            return NotFound();
+
+        CategoryId = (int)id;
+        return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!string.IsNullOrWhiteSpace(NewCategory))
-        {
-            using var connection = context.CreateConnection();
-            var sql = "INSERT INTO category (name) VALUES (@name) RETURNING id;";
-            var categoryId = await connection.ExecuteScalarAsync<int>(
-                sql,
-                new { name = NewCategory }
-            );
-            Exercise.CategoryId = categoryId;
-        }
-
         if (!ModelState.IsValid)
-        {
-            await LoadCategories();
             return Page();
-        }
 
         using (var connection = context.CreateConnection())
         {
-            var sql =
-                @"INSERT INTO exercise (question, solution, answer, hint, category_id) VALUES (@Question, @Solution, @Answer, @Hint, @CategoryId);";
+            var sql = """
+                INSERT INTO exercise (title, question, solution, answer, hint, category_id)
+                VALUES (@Title, @Question, @Solution, @Answer, @Hint, @CategoryId)
+                """;
             await connection.ExecuteAsync(sql, Exercise);
         }
 
-        string categoryName;
-        if (!string.IsNullOrWhiteSpace(NewCategory))
-        {
-            categoryName = NewCategory;
-        }
-        else
-        {
-            using var connection = context.CreateConnection();
-            var sql = "SELECT name FROM category WHERE id = @id;";
-            categoryName = await connection.QuerySingleAsync<string>(
-                sql,
-                new { id = Exercise.CategoryId }
-            );
-        }
-
-        return RedirectToPage("/Categories/Exercises/Index", new { category = categoryName });
-    }
-
-    private async Task LoadCategories()
-    {
-        using var connection = context.CreateConnection();
-        var sql = "SELECT id, name FROM category ORDER BY name;";
-        var categories = await connection.QueryAsync<CategoryDto>(sql);
-        CategoryOptions = new List<SelectListItem>();
-        foreach (var cat in categories)
-        {
-            CategoryOptions.Add(new SelectListItem { Value = cat.Id.ToString(), Text = cat.Name });
-        }
+        return RedirectToPage("/Categories/Exercises/Index", new { category = Category });
     }
 
     public class ExerciseDto
@@ -88,19 +55,11 @@ public class CreateModel(DapperContext context) : PageModel
         [Required]
         public string Solution { get; set; } = default!;
 
-        [Required]
-        public string Answer { get; set; } = default!;
+        public string? Answer { get; set; }
 
         public string? Hint { get; set; }
 
         [Required]
-        [Display(Name = "Category")]
-        public int? CategoryId { get; set; }
-    }
-
-    public class CategoryDto
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int CategoryId { get; set; }
     }
 }

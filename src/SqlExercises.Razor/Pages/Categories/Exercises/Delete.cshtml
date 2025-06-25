@@ -1,5 +1,5 @@
 @page "/Categories/{category:alpha}/Exercises/{id:int}/Delete"
-@model SqlExercises.Razor.Pages.Categories.Exercises.DeleteModel
+@model DeleteModel
 @{
     ViewData["Title"] = "Delete Exercise";
 }
@@ -14,6 +14,7 @@
     </dl>
     <form method="post" asp-route-category="@RouteData.Values["category"]">
         <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-page="/Categories/Exercises/Index" asp-route-category="@RouteData.Values["category"]" class="btn btn-secondary">Cancel</a>
+        <a asp-page="/Categories/Exercises/Index" asp-route-category="@RouteData.Values["category"]"
+            class="btn btn-secondary">Cancel</a>
     </form>
-</div> 
+</div>

@@ -1,11 +1,12 @@
 @page "/Categories/{category:alpha}/Exercises/{id:int}/Edit"
-@model SqlExercises.Razor.Pages.Categories.Exercises.EditModel
+@model EditModel
 @{
     ViewData["Title"] = "Edit Exercise";
 }
 <h2>Edit Exercise</h2>
 <form method="post">
     <input type="hidden" asp-for="Exercise.Id" />
+    <input type="hidden" asp-for="Exercise.CategoryId" />
     <div class="mb-3">
         <label asp-for="Exercise.Title" class="form-label"></label>
         <textarea asp-for="Exercise.Title" class="form-control"></textarea>
@@ -31,18 +32,11 @@
         <input asp-for="Exercise.Hint" class="form-control" />
         <span asp-validation-for="Exercise.Hint" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="Exercise.CategoryId" class="form-label">Category</label>
-        <select asp-for="Exercise.CategoryId" class="form-select" asp-items="Model.CategoryOptions"></select>
-        <span asp-validation-for="Exercise.CategoryId" class="text-danger"></span>
-        <div class="mt-2">
-            <label for="newCategory" class="form-label">Or add new category:</label>
-            <input type="text" id="newCategory" name="NewCategory" class="form-control" value="@Model.NewCategory" />
-            <span asp-validation-for="NewCategory" class="text-danger"></span>
-        </div>
-    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-page="/Categories/Exercises/Index" asp-route-category="@(Model.Category ?? Model.Exercise?.CategoryId.ToString() ?? RouteData.Values["category"]?.ToString())" class="btn btn-secondary">Cancel</a>
+    <a asp-page="/Categories/Exercises/Index"
+        asp-route-category="@(Model.Category ?? Model.Exercise?.CategoryId.ToString() ?? RouteData.Values["category"]?.ToString())"
+        class="btn btn-secondary">Cancel</a>
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
