@@ -23,7 +23,7 @@ public class ExercisesModel(DapperContext context) : PageModel
 
         using var connection = context.CreateConnection();
         var sql = """
-                SELECT ex.id, ex.question
+                SELECT ex.id, ex.Title
                 FROM exercise ex
                 INNER JOIN category cat
                 ON cat.id = ex.category_id
@@ -37,6 +37,6 @@ public class ExercisesModel(DapperContext context) : PageModel
     public class ExerciseDto
     {
         public int Id { get; set; }
-        public string Question { get; set; } = default!;
+        public string Title { get; set; } = default!;
     }
 }
