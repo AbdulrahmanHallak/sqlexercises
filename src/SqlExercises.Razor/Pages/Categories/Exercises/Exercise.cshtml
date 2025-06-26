@@ -12,7 +12,7 @@
         Show/Hide ERD
     </button>
     <div class="collapse mb-3" id="erdCollapse">
-        <img src="/images/erd.jpg" alt="ERD" class="img-fluid border" />
+        <img id="erdImage" src="/images/wrattel.png" alt="ERD" class="img-fluid border" />
     </div>
     <div class="row">
         <div class="col-md-6">
@@ -106,6 +106,18 @@
         </div>
     </div>
 </div>
+<script>
+    // Use the reusable zoom function from site.js
+    window.addEventListener('DOMContentLoaded', function () {
+        const img = document.getElementById('erdImage');
+        if (img) {
+            const container = img.parentElement;
+            if (container) {
+                enableImageZoom(img, container);
+            }
+        }
+    });
+</script>
 @section Scripts {
     <script>
         function renderTable(data) {
@@ -120,11 +132,11 @@
             ).join('');
 
             return `
-                                    <table class="table table-bordered table-sm mb-0">
-                                        <thead><tr>${headers}</tr></thead>
-                                        <tbody>${rows}</tbody>
-                                    </table>
-                                `;
+                                            <table class="table table-bordered table-sm mb-0">
+                                                <thead><tr>${headers}</tr></thead>
+                                                <tbody>${rows}</tbody>
+                                            </table>
+                                        `;
         }
 
         document.getElementById('runQueryBtn').addEventListener('click', async () => {

@@ -18,9 +18,9 @@
             <button id="runQueryBtn" class="btn btn-primary">Run</button>
         </div>
         <div style="margin-left: 25px;">
-            <div class="collapse" id="erdCollapse">
-                <img id="erdImage" src="/images/erd.jpg" alt="ERD" class="img-fluid border"
-                    style="max-width: 800px; height: auto; display: block;" />
+            <div class="collapse" id="erdCollapse" style="overflow: hidden; max-width: 800px;">
+                <img id="erdImage" src="/images/wrattel.png" alt="ERD" class="img-fluid border zoom-image"
+                    style="max-width: 800px; height: auto; object-fit: cover; cursor: zoom-in; transition: transform 0.2s ease;" />
             </div>
         </div>
     </div>
@@ -30,6 +30,20 @@
             style="min-height: 100px; max-height: 300px; overflow-y: auto; overflow-x: auto;"></div>
     </div>
 </div>
+
+<script>
+    // Use the reusable zoom function from site.js
+    window.addEventListener('DOMContentLoaded', function () {
+        const img = document.getElementById('erdImage');
+        if (img) {
+            const container = img.parentElement;
+            if (container) {
+                enableImageZoom(img, container);
+            }
+        }
+    });
+</script>
+
 @section Scripts {
     <script>
         document.getElementById('runQueryBtn').addEventListener('click', async function () {
@@ -53,6 +67,7 @@
                 resultsBox.innerHTML = `<span class='text-danger'>${err}</span>`;
             }
         });
+
         function renderTable(data) {
             if (!Array.isArray(data) || data.length === 0) return '<em>No results.</em>';
             let cols = Object.keys(data[0]);
