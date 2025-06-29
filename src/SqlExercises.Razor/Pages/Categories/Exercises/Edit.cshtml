@@ -6,11 +6,16 @@
 <h2>Edit Exercise</h2>
 <form method="post">
     <input type="hidden" asp-for="Exercise.Id" />
-    <input type="hidden" asp-for="Exercise.CategoryId" />
     <div class="mb-3">
         <label asp-for="Exercise.Title" class="form-label"></label>
         <textarea asp-for="Exercise.Title" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Title" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Exercise.CategoryId" class="form-label">Category</label>
+        <select asp-for="Exercise.CategoryId" asp-items="Model.Categories" class="form-select">
+        </select>
+        <span asp-validation-for="Exercise.CategoryId" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Exercise.Question" class="form-label"></label>

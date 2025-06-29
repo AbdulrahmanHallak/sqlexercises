@@ -19,6 +19,8 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
         [BindProperty(SupportsGet = true)]
         public string Category { get; set; } = default!;
 
+        public IReadOnlyCollection<SelectListItem> Categories { get; set; } = default!;
+
         public async Task<IActionResult> OnGetAsync(int id)
         {
             using var connection = _context.CreateConnection();
@@ -32,6 +34,11 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
                 return NotFound();
             Exercise = exercise;
 
+            // Load available categories for dropdown
+            var categoriesSql = "SELECT id, name FROM category ORDER BY name";
+            var categories = await connection.QueryAsync<CategoryDto>(categoriesSql);
+            Categories = [.. categories.Select(c => new SelectListItem(c.Name, c.Id.ToString()))];
+
             return Page();
         }
 
@@ -40,10 +47,9 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
             if (!ModelState.IsValid)
                 return Page();
 
-            using (var connection = _context.CreateConnection())
-            {
-                var sql =
-                    @"UPDATE exercise SET
+            using var connection = _context.CreateConnection();
+            var sql =
+                @"UPDATE exercise SET
                     title = @Title,
                     question = @Question,
                     solution = @Solution,
@@ -51,11 +57,18 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
                     hint = @Hint,
                     category_id = @CategoryId
                     WHERE id = @Id;";
-                await connection.ExecuteAsync(sql, Exercise);
-            }
+            await connection.ExecuteAsync(sql, Exercise);
+
+            // Get the new category name for redirect
+            var categorySql = "SELECT name FROM category WHERE id = @CategoryId";
+            var newCategoryName = await connection.QuerySingleOrDefaultAsync<string>(
+                categorySql,
+                new { Exercise.CategoryId }
+            );
+
             return RedirectToPage(
                 "/Categories/Exercises/Index",
-                new { category = NewCategory ?? Category }
+                new { category = newCategoryName ?? Category }
             );
         }
 
@@ -78,6 +91,12 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
 
             [Required]
             public int CategoryId { get; set; }
+        }
+
+        public class CategoryDto
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = default!;
         }
     }
 }
