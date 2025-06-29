@@ -27,7 +27,7 @@ public class ExercisesModel(DapperContext context) : PageModel
                 FROM exercise ex
                 INNER JOIN category cat
                 ON cat.id = ex.category_id
-                WHERE cat.name = @name
+                WHERE cat.name ilike @name
                 ORDER BY 1
             """;
         var exercises = await connection.QueryAsync<ExerciseDto>(sql, new { name = category });
