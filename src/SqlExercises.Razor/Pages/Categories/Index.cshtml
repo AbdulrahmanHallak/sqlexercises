@@ -7,7 +7,19 @@
 <h2>Categories</h2>
 @if (Model.IsAdmin)
 {
-    <a asp-page="/Categories/Exercises/Create" class="btn btn-success mb-3">Create New Category</a>
+    <button id="showCreateCategory" class="btn btn-success mb-3" type="button">Create New Category</button>
+    <form id="createCategoryForm" method="post" style="display:none;" class="mb-3">
+        <div class="input-group">
+            <input name="NewCategoryName" class="form-control" placeholder="Category name" maxlength="50" required />
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </form>
+    <script>
+        document.getElementById('showCreateCategory').addEventListener('click', function() {
+            var form = document.getElementById('createCategoryForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        });
+    </script>
 }
 <ul class="list-group">
     @foreach (var category in Model.Categories)
