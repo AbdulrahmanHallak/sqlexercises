@@ -25,7 +25,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
         {
             using var connection = _context.CreateConnection();
             var sql = """
-                SELECT id, title, question, solution, answer, hint, category_id 
+                SELECT id, title, question, solution, explanation, hint, category_id 
                 FROM exercise
                 WHERE id = @id
                 """;
@@ -53,7 +53,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
                     title = @Title,
                     question = @Question,
                     solution = @Solution,
-                    answer = @Answer,
+                    explanation = @Explanation,
                     hint = @Hint,
                     category_id = @CategoryId
                     WHERE id = @Id;";
@@ -85,7 +85,7 @@ namespace SqlExercises.Razor.Pages.Categories.Exercises
             [Required]
             public string Solution { get; set; } = default!;
 
-            public string? Answer { get; set; }
+            public string? Explanation { get; set; }
 
             public string? Hint { get; set; }
 

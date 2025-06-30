@@ -1,5 +1,7 @@
+using FluentMigrator.Runner;
 using Microsoft.AspNetCore.DataProtection;
 using Serilog;
+using SqlExercises.Db;
 using SqlExercises.Razor;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -38,10 +40,17 @@ try
 
     builder.Services.AddSingleton<ConnectionString>(_ => new ConnectionString(connString));
     builder.Services.AddSingleton<DapperContext>();
+    builder.Services.RegisterFluentMigrator(connString);
 
     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
     var app = builder.Build();
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+        runner.MigrateUp();
+    }
 
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())

@@ -101,7 +101,7 @@
                 <strong>Solution:</strong>
                 <pre>@Model.Exercise.Solution</pre>
                 <strong>Explanation:</strong>
-                <p>@Model.Exercise.Answer</p>
+                <p>@Model.Exercise.Explanation</p>
             </div>
         </div>
     </div>
@@ -132,11 +132,11 @@
             ).join('');
 
             return `
-                                            <table class="table table-bordered table-sm mb-0">
-                                                <thead><tr>${headers}</tr></thead>
-                                                <tbody>${rows}</tbody>
-                                            </table>
-                                        `;
+                                                <table class="table table-bordered table-sm mb-0">
+                                                    <thead><tr>${headers}</tr></thead>
+                                                    <tbody>${rows}</tbody>
+                                                </table>
+                                            `;
         }
 
         document.getElementById('runQueryBtn').addEventListener('click', async () => {

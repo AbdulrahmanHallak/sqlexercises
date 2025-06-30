@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{72A919C4-E28
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlExercises.Razor", "src\SqlExercises.Razor\SqlExercises.Razor.csproj", "{A4D718E0-A45B-407F-AACD-3056F6E84BE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlExercises.Db", "src\SqlExercises.Db\SqlExercises.Db.csproj", "{92F355DD-E3E3-47BA-B082-6326AFDF5AF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +22,13 @@ Global
 		{A4D718E0-A45B-407F-AACD-3056F6E84BE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4D718E0-A45B-407F-AACD-3056F6E84BE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4D718E0-A45B-407F-AACD-3056F6E84BE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92F355DD-E3E3-47BA-B082-6326AFDF5AF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92F355DD-E3E3-47BA-B082-6326AFDF5AF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92F355DD-E3E3-47BA-B082-6326AFDF5AF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92F355DD-E3E3-47BA-B082-6326AFDF5AF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4D718E0-A45B-407F-AACD-3056F6E84BE3} = {72A919C4-E287-4EBE-8236-DF75A04CBDB2}
+		{92F355DD-E3E3-47BA-B082-6326AFDF5AF2} = {72A919C4-E287-4EBE-8236-DF75A04CBDB2}
 	EndGlobalSection
 EndGlobal
