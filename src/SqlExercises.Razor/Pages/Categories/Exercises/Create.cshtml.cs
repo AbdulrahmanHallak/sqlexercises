@@ -35,8 +35,8 @@ public class CreateModel(DapperContext context) : PageModel
         using (var connection = context.CreateConnection())
         {
             var sql = """
-                INSERT INTO exercise (title, question, solution, answer, hint, category_id)
-                VALUES (@Title, @Question, @Solution, @Answer, @Hint, @CategoryId)
+                INSERT INTO exercise (title, question, solution, Explanation, hint, category_id)
+                VALUES (@Title, @Question, @Solution, @Explanation, @Hint, @CategoryId)
                 """;
             await connection.ExecuteAsync(sql, Exercise);
         }
@@ -55,7 +55,7 @@ public class CreateModel(DapperContext context) : PageModel
         [Required]
         public string Solution { get; set; } = default!;
 
-        public string? Answer { get; set; }
+        public string? Explanation { get; set; }
 
         public string? Hint { get; set; }
 
