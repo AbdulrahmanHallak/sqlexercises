@@ -31,6 +31,8 @@ public class IndexModel(DapperContext context) : PageModel
         Request.Cookies.TryGetValue("is_admin", out var isAdmin);
         if (isAdmin == "true")
             IsAdmin = true;
+        else
+            return NotFound();
 
         if (!string.IsNullOrWhiteSpace(NewCategoryName))
         {
