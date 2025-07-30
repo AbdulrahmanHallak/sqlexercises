@@ -2,7 +2,8 @@ using FluentMigrator;
 
 namespace SqlExercises.Db.Migrations;
 
-public class LinkExerciseWithUserSchema_202506302251 : Migration
+[Migration(202507281736)]
+public class LinkExerciseWithUserSchema_202507281736 : Migration
 {
     public override void Up()
     {

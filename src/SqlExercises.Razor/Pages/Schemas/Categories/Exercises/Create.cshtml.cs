@@ -3,7 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SqlExercises.Razor.Pages.Categories.Exercises;
+namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
 public class CreateModel(DapperContext context) : PageModel
 {
@@ -13,17 +13,29 @@ public class CreateModel(DapperContext context) : PageModel
     [BindProperty(SupportsGet = true)]
     public string Category { get; set; } = default!;
 
+    [BindProperty(SupportsGet = true)]
+    public string Schema { get; set; } = default!;
+
     public int CategoryId { get; set; }
+    public int UserSchemaId { get; set; }
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var sql = "SELECT id FROM category WHERE name like @category";
+        var sql = """
+                SELECT (SELECT id FROM category WHERE name iLIKE @category) AS category_id,
+                (SELECT id FROM user_schema WHERE schema_name iLIKE @schema) AS schema_id
+            """;
         using var connection = context.CreateConnection();
-        var id = await connection.QueryFirstAsync<int?>(sql, new { Category });
-        if (id is null)
+        (var categoryId, var schemaId) = await connection.QueryFirstAsync<(
+            int? CategoryId,
+            int? SchemaId
+        )>(sql, new { Category, Schema });
+
+        if (categoryId is null || schemaId is null)
             return NotFound();
 
-        CategoryId = (int)id;
+        UserSchemaId = (int)schemaId;
+        CategoryId = (int)categoryId;
         return Page();
     }
 
@@ -35,13 +47,13 @@ public class CreateModel(DapperContext context) : PageModel
         using (var connection = context.CreateConnection())
         {
             var sql = """
-                INSERT INTO exercise (title, question, solution, Explanation, hint, category_id)
-                VALUES (@Title, @Question, @Solution, @Explanation, @Hint, @CategoryId)
+                INSERT INTO exercise (title, question, solution, explanation, hint, category_id, user_schema_id)
+                VALUES (@Title, @Question, @Solution, @Explanation, @Hint, @CategoryId, @UserSchemaId)
                 """;
             await connection.ExecuteAsync(sql, Exercise);
         }
 
-        return RedirectToPage("/Categories/Exercises/Index", new { category = Category });
+        return RedirectToPage("./Index", new { category = Category });
     }
 
     public class ExerciseDto
@@ -61,5 +73,8 @@ public class CreateModel(DapperContext context) : PageModel
 
         [Required]
         public int CategoryId { get; set; }
+
+        [Required]
+        public int UserSchemaId { get; set; }
     }
 }

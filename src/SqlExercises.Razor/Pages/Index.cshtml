@@ -10,4 +10,16 @@
 </form>
 <!-- DIRTY ADMIN LOGIN END -->
 
+<h2>Schemas</h2>
+@* TODO: the create should be only logged-in users *@
+@* <a asp-page="Create" class="btn btn-success mb-3">Create New Schema</a> *@
+<ul class="list-group">
+    @foreach (var schema in Model.Schemas)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <a asp-page="/Schemas/Categories/Index" asp-route-schema="@schema.SchemaName">
+                @schema.SchemaName</a>
+        </li>
+    }
+</ul>
 <!-- about and info and stuff -->

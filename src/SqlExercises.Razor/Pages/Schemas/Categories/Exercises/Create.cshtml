@@ -6,8 +6,8 @@
 <h2>Create Exercise</h2>
 <form method="post">
     <div class="mb-3">
-
-        <input asp-for="Exercise.SchemaCategoryId" type="hidden" value="@Model.SchemaCategoryId"></input>
+        <input asp-for="Exercise.UserSchemaId" type="hidden"></input>
+        <input asp-for="Exercise.CategoryId" type="hidden"></input>
         <label asp-for="Exercise.Title" class="form-label"></label>
         <input asp-for="Exercise.Title" class="form-control"></input>
         <span asp-validation-for="Exercise.Title" class="text-danger"></span>
@@ -24,8 +24,8 @@
     </div>
     <div class="mb-3">
         <label asp-for="Exercise.Explanation" class="form-label"></label>
-        <textarea asp-for="Exercise.Explanationation" class="form-control"></textarea>
-        <span asp-validation-for="Exercise.Explanationation" class="text-danger"></span>
+        <textarea asp-for="Exercise.Explanation" class="form-control"></textarea>
+        <span asp-validation-for="Exercise.Explanation" class="text-danger"></span>
     </div>
     <div class="mb-3">
         <label asp-for="Exercise.Hint" class="form-label"></label>
