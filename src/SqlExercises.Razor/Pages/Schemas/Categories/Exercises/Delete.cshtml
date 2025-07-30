@@ -1,4 +1,4 @@
-@page "/Categories/{category:alpha}/Exercises/{id:int}/Delete"
+@page "/Schemas/{schema:alpha}/Categories/{category:alpha}/Exercises/{id:int}/Delete"
 @model DeleteModel
 @{
     ViewData["Title"] = "Delete Exercise";
@@ -9,12 +9,15 @@
     <dl class="row">
         <dt class="col-sm-2">Question</dt>
         <dd class="col-sm-10">@Model.Exercise.Question</dd>
+        <dt class="col-sm-2">Schema</dt>
+        <dd class="col-sm-10">@Model.Exercise.SchemaName</dd>
         <dt class="col-sm-2">Category</dt>
         <dd class="col-sm-10">@Model.Exercise.CategoryName</dd>
     </dl>
-    <form method="post" asp-route-category="@RouteData.Values["category"]">
+    <form method="post" asp-route-category="@Model.Category" asp-route-schema="@Model.Schema">
+        <input asp-for="Exercise.Id" type="hidden">
         <button type="submit" class="btn btn-danger">Delete</button>
-        <a asp-page="/Categories/Exercises/Index" asp-route-category="@RouteData.Values["category"]"
-            class="btn btn-secondary">Cancel</a>
     </form>
+    <a asp-page="./Index" asp-route-category="@Model.Category" asp-route-schema="@Model.Schema"
+        class="btn btn-secondary">Cancel</a>
 </div>

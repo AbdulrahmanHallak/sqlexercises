@@ -1,13 +1,13 @@
 using System.Data;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Dapper;
 using K4os.Hash.xxHash;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SqlExercises.Razor.Pages.Categories.Exercises;
+namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
+// todo: fix this
 [IgnoreAntiforgeryToken]
 public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context) : PageModel
 {
@@ -22,7 +22,6 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
     public List<Dictionary<string, object>> ExpectedResult { get; set; } = default!;
 
     // For POST
-
     [BindProperty]
     public string PostedSolution { get; set; } = default!;
 
@@ -50,6 +49,7 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
 
     public async Task<IActionResult> OnPost()
     {
+        // TODO: fix duplicate column name.
         if (PostedSolution is null)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
@@ -69,7 +69,12 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
         }
         catch (Exception ex)
         {
-            logger.LogInformation("sql solution error:\n{Exception}:{Message}", ex, ex.Message);
+            logger.LogInformation(
+                "sql solution error for exercise {ExerciseId}:\n{Exception}:{Message}",
+                ex,
+                ex.Message,
+                Id
+            );
             return new JsonResult(new { result = ex.Message, isEqual = false });
         }
         var resultString = StringifyDynamicList(resultRows);

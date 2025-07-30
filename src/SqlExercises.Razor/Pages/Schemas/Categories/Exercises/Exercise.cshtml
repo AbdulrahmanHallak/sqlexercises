@@ -1,4 +1,4 @@
-@page "/Categories/{category:alpha}/Exercises/{id:int}"
+@page "/Schemas/{schema:alpha}/Categories/{category:alpha}/Exercises/{id:int}"
 @model ExerciseModel
 @{
     ViewData["Title"] = "Exercise";
@@ -19,7 +19,6 @@
             <label for="sqlInput" class="form-label" style="display: block;">Your SQL:</label>
             <textarea id="sqlInput" class="sql-input"></textarea>
             <div class="d-flex gap-2 mt-2">
-                <!-- Run and Hint buttons now side-by-side -->
                 <button id="runQueryBtn" class="btn btn-primary">Run</button>
                 <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#hintModal">
                     Show Hint
@@ -107,7 +106,6 @@
     </div>
 </div>
 <script>
-    // Use the reusable zoom function from site.js
     window.addEventListener('DOMContentLoaded', function () {
         const img = document.getElementById('erdImage');
         if (img) {
@@ -132,11 +130,11 @@
             ).join('');
 
             return `
-                                                <table class="table table-bordered table-sm mb-0">
-                                                    <thead><tr>${headers}</tr></thead>
-                                                    <tbody>${rows}</tbody>
-                                                </table>
-                                            `;
+                <table class="table table-bordered table-sm mb-0">
+                    <thead><tr>${headers}</tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
         }
 
         document.getElementById('runQueryBtn').addEventListener('click', async () => {

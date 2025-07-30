@@ -1,0 +1,28 @@
+﻿@page "/schemas/{schema:alpha}/categories"
+@model IndexModel
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h2>Categories</h2>
+<ul class="list-group">
+    @if (Model.Categories is { Count: 0 })
+    {
+        // TODO: make this better
+        <p>does not have any categories please create new exercise</p>
+    }
+    else
+    {
+        foreach (var category in Model.Categories!)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                    <a asp-page="./Exercises/Index" asp-route-category="@category" asp-route-schema="@Model.Schema">
+                        @category
+                    </a>
+                </span>
+            </li>
+        }
+    }
+
+</ul>

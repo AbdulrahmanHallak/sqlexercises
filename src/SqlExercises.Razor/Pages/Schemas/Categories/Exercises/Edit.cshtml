@@ -1,4 +1,4 @@
-@page "/Categories/{category:alpha}/Exercises/{id:int}/Edit"
+@page "/Schemas/{schema:alpha}/Categories/{category:alpha}/Exercises/{id:int}/Edit"
 @model EditModel
 @{
     ViewData["Title"] = "Edit Exercise";
@@ -39,9 +39,10 @@
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-page="/Categories/Exercises/Index"
-        asp-route-category="@(Model.Category ?? Model.Exercise?.CategoryId.ToString() ?? RouteData.Values["category"]?.ToString())"
-        class="btn btn-secondary">Cancel</a>
+    @* //TODO: *@
+    @* <a asp-page="/Categories/Exercises/Index" *@
+        @* asp-route-category="@(Model.Category ?? Model.Exercise?.CategoryId.ToString() ?? RouteData.Values["category"]?.ToString())" *@
+        @* class="btn btn-secondary">Cancel</a> *@
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
