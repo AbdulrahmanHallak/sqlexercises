@@ -1,15 +1,6 @@
 ﻿@page
 @model SqlExercises.Razor.Pages.IndexModel
 
-<!-- DIRTY ADMIN LOGIN BEGIN: Remove this after proper implementation -->
-<form method="post" class="mb-3" style="max-width: 300px;">
-    <div class="input-group">
-        <input type="password" name="adminSecret" class="form-control" placeholder="Admin secret" autocomplete="off" />
-        <button type="submit" class="btn btn-danger">Admin Login</button>
-    </div>
-</form>
-<!-- DIRTY ADMIN LOGIN END -->
-
 <h2>Schemas</h2>
 @* TODO: the create should be only logged-in users *@
 @* <a asp-page="Create" class="btn btn-success mb-3">Create New Schema</a> *@
@@ -22,4 +13,3 @@
         </li>
     }
 </ul>
-<!-- about and info and stuff -->
