@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.DataProtection;
 using Serilog;
 using SqlExercises.Db;
 using SqlExercises.Razor;
+using SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
+using SqlExercises.Razor.Pages.Shared.Filters;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 try
@@ -15,9 +17,13 @@ try
 
     // Add services to the container.
     builder.Services.AddRazorPages();
-    builder.Configuration.AddEnvironmentVariables();
+
     var connString =
-        builder.Configuration.GetConnectionString("Postgres")
+        builder.Configuration.GetConnectionString("Postgres:Default")
+        ?? throw new InvalidOperationException("Connection string cannot be null");
+
+    var solutionString =
+        builder.Configuration.GetConnectionString("Postgres:Solution")
         ?? throw new InvalidOperationException("Connection string cannot be null");
 
     builder.Services.Configure<RouteOptions>(opts =>
@@ -25,6 +31,8 @@ try
         opts.LowercaseQueryStrings = true;
         opts.LowercaseUrls = true;
     });
+
+    // this is to persist keys across docker containers.
     builder
         .Services.AddDataProtection()
         .PersistKeysToFileSystem(
@@ -38,9 +46,12 @@ try
         )
         .SetApplicationName("MyApp");
 
-    builder.Services.AddSingleton<ConnectionString>(_ => new ConnectionString(connString));
-    builder.Services.AddSingleton<DapperContext>();
+    builder.Services.AddSingleton(_ => new ConnectionString(connString));
+    builder.Services.AddSingleton<SolutionChecker>();
+    builder.Services.AddScoped<DapperContext>();
+    builder.Services.AddScoped(_ => new SolutionConnectionString(solutionString));
     builder.Services.RegisterFluentMigrator(connString);
+    builder.Services.AddScoped<SearchPathFilter>();
 
     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 

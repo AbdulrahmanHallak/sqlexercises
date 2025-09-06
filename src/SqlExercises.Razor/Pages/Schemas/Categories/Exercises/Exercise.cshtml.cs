@@ -1,15 +1,19 @@
 using System.Data;
-using System.Text;
 using Dapper;
-using K4os.Hash.xxHash;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
 // todo: fix this
 [IgnoreAntiforgeryToken]
-public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context) : PageModel
+[SearchPath]
+public class ExerciseModel(
+    ILogger<ExerciseModel> logger,
+    DapperContext context,
+    SolutionChecker checker
+) : PageModel
 {
     // For GET
     [BindProperty(SupportsGet = true)]
@@ -27,18 +31,21 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
 
     public async Task<IActionResult> OnGet()
     {
-        using var connection = context.CreateConnection();
-        var sql = """
-                SELECT id, question, explanation, hint, solution, title
-                FROM exercise
-                WHERE id = @id
-            """;
-        var result = await connection.QuerySingleAsync<ExerciseDto>(sql, new { id = Id });
-        if (result is null)
-            return NotFound();
-        Exercise = result;
+        using (var connection = context.CreateConnection())
+        {
+            var sql = """
+                    SELECT id, question, explanation, hint, solution, title
+                    FROM exercise
+                    WHERE id = @id
+                """;
+            var result = await connection.QuerySingleAsync<ExerciseDto>(sql, new { id = Id });
+            if (result is null)
+                return NotFound();
+            Exercise = result;
+        }
+        using var solutionConnection = context.CreateSolutionConnection();
 
-        var expectedResults = await connection.QueryAsync(result.Solution);
+        var expectedResults = await solutionConnection.QueryAsync(Exercise.Solution);
         var typeSafe = expectedResults
             .Select(row => new Dictionary<string, object>((IDictionary<string, object>)row))
             .ToList();
@@ -50,22 +57,26 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
     public async Task<IActionResult> OnPost()
     {
         // TODO: fix duplicate column name.
+        // TODO: refactor into service class to simplify controller.
         if (PostedSolution is null)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
-        using var connection = context.CreateConnection();
-        var sql = "SELECT solution FROM exercise WHERE id = @id";
-        var solution = await connection.QuerySingleAsync<string>(sql, new { id = Id });
-        var solutionResult = await connection.QueryAsync(solution);
-        var solutionString = StringifyDynamicList(solutionResult);
-        byte[] solutionData = Encoding.UTF8.GetBytes(solutionString);
-        var solutionHash = XXH64.DigestOf(solutionData);
+        string solution;
+        using (var connection = context.CreateConnection())
+        {
+            var sql = "SELECT solution FROM exercise WHERE id = @id";
+            solution = await connection.QuerySingleAsync<string>(sql, new { id = Id });
+        }
+
+        using var solutionConnection = context.CreateSolutionConnection();
+
+        IEnumerable<dynamic> solutionResult = await solutionConnection.QueryAsync(solution);
 
         IEnumerable<dynamic> resultRows;
         try
         {
             logger.LogInformation("Executing sql solution:\n{solution}", PostedSolution);
-            resultRows = await connection.QueryAsync(PostedSolution);
+            resultRows = await solutionConnection.QueryAsync(PostedSolution);
         }
         catch (Exception ex)
         {
@@ -77,29 +88,10 @@ public class ExerciseModel(ILogger<ExerciseModel> logger, DapperContext context)
             );
             return new JsonResult(new { result = ex.Message, isEqual = false });
         }
-        var resultString = StringifyDynamicList(resultRows);
-        byte[] resultData = Encoding.UTF8.GetBytes(resultString);
-        var resultHash = XXH64.DigestOf(resultData);
 
-        var isEqual = solutionHash.Equals(resultHash);
+        var isEqual = checker.IsCorrect([.. resultRows], [.. solutionResult]);
 
         return new JsonResult(new { result = resultRows, isEqual });
-    }
-
-    private static string StringifyDynamicList(IEnumerable<dynamic> dynamics)
-    {
-        var typeSafe = dynamics
-            .Select(row => new Dictionary<string, object>((IDictionary<string, object>)row))
-            .ToList();
-
-        StringBuilder solString = new();
-        foreach (var row in typeSafe)
-        {
-            foreach (var column in row)
-                solString.Append($"{column.Value}");
-        }
-
-        return solString.ToString();
     }
 
     public class ExerciseDto
