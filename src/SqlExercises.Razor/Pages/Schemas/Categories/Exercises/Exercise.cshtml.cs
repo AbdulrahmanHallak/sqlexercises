@@ -6,8 +6,6 @@ using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
-// todo: fix this
-[IgnoreAntiforgeryToken]
 [SearchPath]
 public class ExerciseModel(
     ILogger<ExerciseModel> logger,
@@ -24,10 +22,6 @@ public class ExerciseModel(
 
     public ExerciseDto Exercise { get; set; } = default!;
     public List<Dictionary<string, object>> ExpectedResult { get; set; } = default!;
-
-    // For POST
-    [BindProperty]
-    public string PostedSolution { get; set; } = default!;
 
     public async Task<IActionResult> OnGet()
     {
@@ -54,11 +48,11 @@ public class ExerciseModel(
         return Page();
     }
 
-    public async Task<IActionResult> OnPost()
+    public async Task<IActionResult> OnPost(string postedSolution)
     {
         // TODO: fix duplicate column name.
         // TODO: refactor into service class to simplify controller.
-        if (PostedSolution is null)
+        if (postedSolution is null)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
         string solution;
@@ -75,8 +69,8 @@ public class ExerciseModel(
         IEnumerable<dynamic> resultRows;
         try
         {
-            logger.LogInformation("Executing sql solution:\n{solution}", PostedSolution);
-            resultRows = await solutionConnection.QueryAsync(PostedSolution);
+            logger.LogInformation("Executing sql solution:\n{solution}", postedSolution);
+            resultRows = await solutionConnection.QueryAsync(postedSolution);
         }
         catch (Exception ex)
         {

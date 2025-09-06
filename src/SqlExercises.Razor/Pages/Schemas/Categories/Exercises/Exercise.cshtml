@@ -16,20 +16,22 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-            <label for="sqlInput" class="form-label" style="display: block;">Your SQL:</label>
-            <textarea id="sqlInput" class="sql-input"></textarea>
-            <div class="d-flex gap-2 mt-2">
-                <button id="runQueryBtn" class="btn btn-primary">Run</button>
-                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#hintModal">
-                    Show Hint
-                </button>
-            </div>
+            <form id="sqlForm" method="post">
+                <label for="sqlInput" class="form-label" style="display: block;">Your SQL:</label>
+                <textarea id="sqlInput" name="Sql" class="sql-input"></textarea>
+                <div class="d-flex gap-2 mt-2">
+                    <button id="runQueryBtn" type="button" class="btn btn-primary">Run</button>
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#hintModal">
+                        Show Hint
+                    </button>
+                </div>
+            </form>
 
-            <!-- Results box below buttons -->
             <label class="form-label mt-3">Results <span id="correctnessLabel"></span></label>
             <div id="resultsBox" class="bg-white border p-2"
                 style="min-height: 60px; max-height: 300px; overflow-y: auto; overflow-x: auto;">(Results will appear
-                here)</div>
+                here)
+            </div>
         </div>
         <div class="col-md-6">
             <label class="form-label">Expected Results:</label>
@@ -66,7 +68,6 @@
             </div>
         </div>
     </div>
-    <!-- Hint Modal -->
     <div class="modal fade" id="hintModal" tabindex="-1" aria-labelledby="hintModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -119,22 +120,11 @@
 @section Scripts {
     <script>
         function renderTable(data) {
-            if (!Array.isArray(data) || !data.length)
-                return '<em>No results.</em>';
-
-            const columns = Object.keys(data[0]);
-            const headers = columns.map(c => `<th>${c}</th>`).join('');
-
-            const rows = data.map(row =>
-                `<tr>${columns.map(col => `<td>${row[col]}</td>`).join('')}</tr>`
-            ).join('');
-
-            return `
-                <table class="table table-bordered table-sm mb-0">
-                    <thead><tr>${headers}</tr></thead>
-                    <tbody>${rows}</tbody>
-                </table>
-            `;
+            if (!Array.isArray(data) || data.length === 0) return '<em>No results.</em>';
+            let cols = Object.keys(data[0]);
+            let thead = '<thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead>';
+            let tbody = '<tbody>' + data.map(row => '<tr>' + cols.map(c => `<td>${row[c]}</td>`).join('') + '</tr>').join('') + '</tbody>';
+            return `<table class="table table-bordered table-sm mb-0">${thead}${tbody}</table>`;
         }
 
         document.getElementById('runQueryBtn').addEventListener('click', async () => {
@@ -148,7 +138,8 @@
             try {
                 const formData = new FormData();
                 formData.append('PostedSolution', sql);
-
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                formData.append('__RequestVerificationToken', token);
                 const response = await fetch(window.location.pathname, {
                     method: 'POST',
                     body: formData
