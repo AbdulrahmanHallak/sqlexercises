@@ -1,7 +1,7 @@
-@page
-@model SqlExercises.Razor.Pages.TestingModel
+@page "/Schemas/{schema:alpha}/playground"
+@model PlaygroundModel
 @{
-    ViewData["Title"] = "Test SQL";
+    ViewData["Title"] = "Playground";
 }
 <div class="container mt-4">
     <h2>Test SQL</h2>
@@ -11,15 +11,18 @@
     </button>
     <div class="d-flex align-items-start tight-row">
         <div style="flex: 1 1 0; min-width: 0;">
-            <div class="mb-2">
-                <label for="sqlInput" class="form-label" style="display: block;">Enter SQL Query:</label>
-                <textarea id="sqlInput" class="sql-input"></textarea>
-            </div>
-            <button id="runQueryBtn" class="btn btn-primary">Run</button>
+            <form id="sqlForm" method="post">
+                <div class="mb-2">
+                    <label for="sqlInput" class="form-label" style="display: block;">Enter SQL Query:</label>
+                    <textarea id="sqlInput" name="Sql" class="sql-input"></textarea>
+                </div>
+                <button id="runQueryBtn" type="button" class="btn btn-primary">Run</button>
+            </form>
         </div>
+
         <div style="margin-left: 25px;">
             <div class="collapse" id="erdCollapse" style="overflow: hidden; max-width: 800px;">
-                <img id="erdImage" src="/images/wrattel.png" alt="ERD" class="img-fluid border zoom-image"
+                <img id="erdImage" src="/images/@(Model.Schema).png" alt="ERD" class="img-fluid border zoom-image"
                     style="max-width: 800px; height: auto; object-fit: cover; cursor: zoom-in; transition: transform 0.2s ease;" />
             </div>
         </div>
@@ -53,10 +56,14 @@
             try {
                 const formData = new FormData();
                 formData.append('Sql', sql);
-                const response = await fetch('@Url.Page("/Testing")', {
+                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                formData.append('__RequestVerificationToken', token);
+
+                const response = await fetch('@Url.Page("playground")', {
                     method: 'POST',
                     body: formData
                 });
+
                 const data = await response.json();
                 if (data.error) {
                     resultsBox.innerHTML = `<span class='text-danger'>${data.error}</span>`;
