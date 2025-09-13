@@ -7,7 +7,7 @@ public class AddTenantsRelations_202506302139 : Migration
     {
         Create
             .Table("user_schema")
-            .InSchema("public")
+            .InSchema("sqlexercises")
             .WithColumn("id")
             .AsInt32()
             .PrimaryKey()
@@ -31,6 +31,6 @@ public class AddTenantsRelations_202506302139 : Migration
 
     public override void Down()
     {
-        Delete.Table("user_schema").InSchema("public");
+        Delete.Table("user_schema").InSchema("sqlexercises");
     }
 }

@@ -7,14 +7,15 @@ public class InitialMigration_202506270036 : Migration
 {
     public override void Down()
     {
-        Delete.Table("exercise");
-        Delete.Table("category");
+        Delete.Table("exercise").InSchema("sqlexercises");
+        Delete.Table("category").InSchema("sqlexercises");
     }
 
     public override void Up()
     {
         Create
             .Table("category")
+            .InSchema("sqlexercises")
             .WithColumn("id")
             .AsInt64()
             .Identity()
@@ -26,6 +27,7 @@ public class InitialMigration_202506270036 : Migration
 
         Create
             .Table("exercise")
+            .InSchema("sqlexercises")
             .WithColumn("id")
             .AsInt64()
             .Identity()
@@ -56,6 +58,6 @@ public class InitialMigration_202506270036 : Migration
             .AsInt64()
             .NotNullable()
             .Indexed()
-            .ForeignKey("exercise_category_fk", "category", "id");
+            .ForeignKey("exercise_category_fk", "sqlexercises", "category", "id");
     }
 }
