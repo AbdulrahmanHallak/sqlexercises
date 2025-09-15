@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Serilog;
 using SqlExercises.Db;
 using SqlExercises.Razor;
+using SqlExercises.Razor.Pages.Schemas;
 using SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 using SqlExercises.Razor.Pages.Shared.Filters;
 
@@ -52,6 +53,7 @@ try
     builder.Services.AddScoped(_ => new SolutionConnectionString(solutionString));
     builder.Services.RegisterFluentMigrator(connString);
     builder.Services.AddScoped<SearchPathFilter>();
+    builder.Services.AddScoped<UserSqlRunner>();
 
     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
