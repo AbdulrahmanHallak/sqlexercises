@@ -17,7 +17,7 @@ public class PlaygroundModel(ILogger<PlaygroundModel> logger, DapperContext cont
     public async Task<IActionResult> OnGet()
     {
         using var connection = context.CreateConnection();
-        var sql = "SELECT EXISTS(SELECT 1 FROM user_schema WHERE schema_name iLIKE @schema)";
+        var sql = "SELECT EXISTS(SELECT 1 FROM user_schema WHERE short_name iLIKE @schema)";
         var schemaExists = await connection.QuerySingleAsync<bool>(sql, new { Schema });
         if (!schemaExists)
             return NotFound();

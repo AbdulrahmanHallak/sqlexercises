@@ -30,7 +30,7 @@ public class IndexModel(DapperContext context) : PageModel
                   ON ex.category_id = cat.id
                 INNER JOIN user_schema us
                   ON us.id = ex.user_schema_id
-                WHERE us.schema_name iLIKE @schema
+                WHERE us.short_name iLIKE @schema
                 GROUP BY cat.id
                 ORDER BY 1
             """;

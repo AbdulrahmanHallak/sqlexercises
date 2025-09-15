@@ -23,7 +23,7 @@ public class CreateModel(DapperContext context) : PageModel
     {
         var sql = """
                 SELECT (SELECT id FROM category WHERE name iLIKE @category) AS category_id,
-                (SELECT id FROM user_schema WHERE schema_name iLIKE @schema) AS schema_id
+                (SELECT id FROM user_schema WHERE short_name iLIKE @schema) AS schema_id
             """;
         using var connection = context.CreateConnection();
         (var categoryId, var schemaId) = await connection.QueryFirstAsync<(

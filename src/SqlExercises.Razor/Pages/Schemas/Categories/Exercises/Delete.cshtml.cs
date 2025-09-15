@@ -19,14 +19,14 @@ public class DeleteModel(DapperContext context) : PageModel
         // TODO: implement security checks and soft deletes.
         using var connection = context.CreateConnection();
         var sql = """
-            SELECT ex.id, ex.question, cat.name AS CategoryName, us.schema_name AS SchemaName
+            SELECT ex.id, ex.question, cat.name AS CategoryName, us.short_name AS SchemaName
             FROM exercise ex
             INNER JOIN category cat
               ON cat.id = ex.category_id
             INNER JOIN user_schema us
               ON us.id = ex.user_schema_id
             WHERE
-              ex.id = @id AND cat.name iLIKE @category AND us.schema_name iLIKE @schema
+              ex.id = @id AND cat.name iLIKE @category AND us.short_name iLIKE @schema
             """;
         Exercise = (
             await connection.QuerySingleOrDefaultAsync<ExerciseDto>(

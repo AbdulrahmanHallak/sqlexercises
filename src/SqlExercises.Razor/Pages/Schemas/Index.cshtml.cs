@@ -10,7 +10,7 @@ public class IndexModel(DapperContext context) : PageModel
     public async Task OnGetAsync()
     {
         using var connection = context.CreateConnection();
-        var sql = "SELECT id, schema_name FROM user_schema ORDER BY schema_name";
+        var sql = "SELECT id, schema_name, short_name FROM user_schema ORDER BY schema_name";
         var schemas = await connection.QueryAsync<SchemaDto>(sql);
         Schemas = [.. schemas];
     }
@@ -19,5 +19,6 @@ public class IndexModel(DapperContext context) : PageModel
     {
         public short Id { get; set; }
         public string SchemaName { get; set; } = default!;
+        public string ShortName { get; set; } = default!;
     }
 }
