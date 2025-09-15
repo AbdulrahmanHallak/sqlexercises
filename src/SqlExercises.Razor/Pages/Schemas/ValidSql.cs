@@ -44,7 +44,7 @@ public record ValidSql
             {
                 stmts = new SqlQueryParser().Parse(
                     statements,
-                    new ParserOptions { RecursionLimit = 4, TrailingCommas = false }
+                    new ParserOptions { TrailingCommas = false }
                 );
             }
             catch (ParserException ex)
