@@ -1,18 +1,29 @@
-@page
+@page "/schemas/create"
 @model CreateModel
 @{
     ViewData["Title"] = "Create Schema";
 }
 <h2>Create Schema</h2>
 <form method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="mb-3">
         <label asp-for="Schema.Name" class="form-label">Name</label>
-        <input asp-for="Schema.Name" class="form-control" maxlength="10" />
+        <input asp-for="Schema.Name" class="form-control" maxlength="20" />
         <span asp-validation-for="Schema.Name" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Schema.ShortName" class="form-label">Short Name</label>
+        <input asp-for="Schema.ShortName" class="form-control" maxlength="10" />
+        <span asp-validation-for="Schema.ShortName" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Schema.CreateStatements" class="form-label">Create Statements</label>
+        <textarea asp-for="Schema.CreateStatements" class="form-control" rows="10"></textarea>
+        <span asp-validation-for="Schema.CreateStatements" class="text-danger"></span>
     </div>
     <button type="submit" class="btn btn-primary">Create</button>
     <a asp-page="./Index" class="btn btn-secondary">Cancel</a>
 </form>
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-} 
+}
