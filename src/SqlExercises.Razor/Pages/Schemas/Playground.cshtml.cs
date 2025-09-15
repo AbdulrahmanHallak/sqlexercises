@@ -31,7 +31,7 @@ public class PlaygroundModel(ILogger<PlaygroundModel> logger, DapperContext cont
             if (string.IsNullOrWhiteSpace(Sql))
                 return new JsonResult(new SqlResult { Results = [], Error = "No SQL provided" });
 
-            logger.LogInformation("Executing sql:\n{sql}", Sql);
+            logger.LogInformation("Executing sql on schema {schema}:\n{sql}", Sql, Schema);
 
             using var connection = context.CreateSolutionConnection();
             var results = (await connection.QueryAsync(Sql)).ToArray();
