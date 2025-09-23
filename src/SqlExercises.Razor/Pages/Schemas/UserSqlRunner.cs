@@ -1,3 +1,4 @@
+using System.Data;
 using Dapper;
 using Npgsql;
 
@@ -119,5 +120,31 @@ public class UserSqlRunner(
         }
         // TODO: error handling and result
         return true;
+    }
+
+    public async Task<IEnumerable<T>> QueryReadOnly<T>(
+        string schemaShortName,
+        string sql,
+        Func<IDbConnection, IDbTransaction, string, Task<IEnumerable<T>>> func
+    )
+    {
+        using var connection = schemaCtx.CreateConnection(schemaShortName);
+        connection.Open();
+        using var transaction = connection.BeginTransaction();
+        await connection.ExecuteAsync("SET TRANSACTION READ ONLY", transaction: transaction);
+
+        IEnumerable<T>? result;
+        try
+        {
+            result = await func(connection, transaction, sql);
+            transaction.Rollback();
+        }
+        catch (PostgresException)
+        {
+            transaction.Rollback();
+            throw;
+        }
+
+        return result;
     }
 }

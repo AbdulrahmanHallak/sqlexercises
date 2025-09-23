@@ -10,7 +10,7 @@ namespace SqlExercises.Razor.Pages.Schemas;
 public class PlaygroundModel(
     ILogger<PlaygroundModel> logger,
     AppDapperContext defaultCtx,
-    UserDapperContext schemaCtx
+    UserSqlRunner runner
 ) : PageModel
 {
     [BindProperty]
@@ -41,10 +41,15 @@ public class PlaygroundModel(
                 return new JsonResult(new SqlResult { Results = [], Error = "not allowed sql" });
 
             logger.LogInformation("Executing sql on schema {schema}:\n{sql}", Sql, Schema);
-
-            using var connection = schemaCtx.CreateConnection(Schema);
-            var results = (await connection.QueryAsync(Sql)).ToArray();
-            return new JsonResult(new SqlResult { Results = results });
+            var results = await runner.QueryReadOnly(
+                Schema,
+                Sql,
+                async (connection, transaction, sql) =>
+                {
+                    return await connection.QueryAsync(sql);
+                }
+            );
+            return new JsonResult(new SqlResult { Results = [.. results] });
         }
         catch (PostgresException ex)
         {

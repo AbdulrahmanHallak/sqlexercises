@@ -11,7 +11,7 @@ namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 public class ExerciseModel(
     ILogger<ExerciseModel> logger,
     AppDapperContext ctx,
-    UserDapperContext schemaCtx,
+    UserSqlRunner runner,
     SolutionChecker checker
 ) : PageModel
 {
@@ -42,9 +42,15 @@ public class ExerciseModel(
                 return NotFound();
             Exercise = result;
         }
-        using var solutionConnection = schemaCtx.CreateConnection(Schema);
 
-        var expectedResults = await solutionConnection.QueryAsync(Exercise.Solution);
+        var expectedResults = await runner.QueryReadOnly(
+            Schema,
+            Exercise.Solution,
+            async (connection, transaction, sql) =>
+            {
+                return await connection.QueryAsync(sql, transaction: transaction);
+            }
+        );
         var typeSafe = expectedResults
             .Select(row => new Dictionary<string, object>((IDictionary<string, object>)row))
             .ToList();
@@ -72,17 +78,21 @@ public class ExerciseModel(
             solution = await connection.QuerySingleAsync<string>(sql, new { id = Id });
         }
 
-        using var solConnection = schemaCtx.CreateConnection(Schema);
-        solConnection.Open();
-        using var transaction = solConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-        IEnumerable<dynamic> solutionResult = await solConnection.QueryAsync(solution);
+        IEnumerable<dynamic> solutionResult = await runner.QueryReadOnly(
+            Schema,
+            solution,
+            async (connection, transaction, solution) => await connection.QueryAsync(solution)
+        );
 
         IEnumerable<dynamic> resultRows;
         try
         {
             logger.LogInformation("Executing sql solution:\n{solution}", postedSolution);
-            resultRows = await solConnection.QueryAsync(postedSolution);
+            resultRows = await runner.QueryReadOnly(
+                Schema,
+                postedSolution,
+                async (connection, transaction, sql) => await connection.QueryAsync(sql)
+            );
         }
         catch (PostgresException ex)
         {
