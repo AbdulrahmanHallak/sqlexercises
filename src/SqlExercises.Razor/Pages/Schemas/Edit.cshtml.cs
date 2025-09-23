@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas;
 
-public class EditModel(DapperContext context, UserSqlRunner runner) : PageModel
+public class EditModel(AppDapperContext ctx, UserSqlRunner runner) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string Schema { get; set; } = default!;
@@ -15,7 +15,7 @@ public class EditModel(DapperContext context, UserSqlRunner runner) : PageModel
 
     public async Task<IActionResult> OnGet()
     {
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = "SELECT schema_name FROM user_schema WHERE short_name = @shortName";
         var schemaName = await connection.QuerySingleOrDefaultAsync<string>(
             sql,
@@ -31,9 +31,14 @@ public class EditModel(DapperContext context, UserSqlRunner runner) : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-        using var connection = context.CreateConnection();
-        var sql = "UPDATE user_schema SET schema_name = @newName WHERE short_name = @shortName";
-        await connection.ExecuteAsync(sql, new { newName = EditSchema.Name, shortName = Schema });
+        using (var connection = ctx.CreateConnection())
+        {
+            var sql = "UPDATE user_schema SET schema_name = @newName WHERE short_name = @shortName";
+            await connection.ExecuteAsync(
+                sql,
+                new { newName = EditSchema.Name, shortName = Schema }
+            );
+        }
 
         if (EditSchema.Sql is { })
         {

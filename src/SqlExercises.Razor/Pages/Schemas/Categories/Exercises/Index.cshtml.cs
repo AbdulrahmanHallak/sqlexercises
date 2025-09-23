@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
-public class ExercisesModel(DapperContext context) : PageModel
+public class ExercisesModel(AppDapperContext ctx) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string? Schema { get; set; }
@@ -19,7 +19,7 @@ public class ExercisesModel(DapperContext context) : PageModel
         if (Category is null || Schema is null)
             return NotFound();
 
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = """
                 SELECT ex.id, ex.Title
                 FROM exercise ex

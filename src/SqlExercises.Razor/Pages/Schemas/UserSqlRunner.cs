@@ -1,10 +1,13 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Npgsql;
 
 namespace SqlExercises.Razor.Pages.Schemas;
 
-public class UserSqlRunner(DapperContext context, ILogger<UserSqlRunner> logger)
+public class UserSqlRunner(
+    AppDapperContext ctx,
+    UserDapperContext schemaCtx,
+    ILogger<UserSqlRunner> logger
+)
 {
     public async Task<(bool created, string? error)> CreateSchema(
         string schemaName,
@@ -42,7 +45,7 @@ public class UserSqlRunner(DapperContext context, ILogger<UserSqlRunner> logger)
                 VALUES(@name, '{shortName}');
             """;
 
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         connection.Open();
         using (var transaction = connection.BeginTransaction())
         {
@@ -54,8 +57,8 @@ public class UserSqlRunner(DapperContext context, ILogger<UserSqlRunner> logger)
                 );
 
                 var userSql = $"""
-                       SET ROLE {shortName};
                        SET search_path =  {shortName};
+                       SET ROLE {shortName};
                        {sql}
                     """;
                 await connection.ExecuteAsync(userSql, transaction: transaction);
@@ -92,11 +95,11 @@ public class UserSqlRunner(DapperContext context, ILogger<UserSqlRunner> logger)
     public async Task<bool> ExecuteUserCmd(ValidSql userCmd, string schemaShortName)
     {
         var sql = $"""
-               SET ROLE {schemaShortName};
                SET search_path =  {schemaShortName};
+               SET ROLE {schemaShortName};
                {userCmd}
             """;
-        using var connection = context.CreateConnection();
+        using var connection = schemaCtx.CreateConnection(schemaShortName);
         connection.Open();
         using var transaction = connection.BeginTransaction();
         try

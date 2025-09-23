@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories;
 
-public class IndexModel(DapperContext context) : PageModel
+public class IndexModel(AppDapperContext ctx) : PageModel
 {
     public IReadOnlyCollection<string?> Categories { get; set; } = default!;
 
@@ -19,7 +19,7 @@ public class IndexModel(DapperContext context) : PageModel
         if (isAdmin == "true")
             IsAdmin = true;
 
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         // this only shows categories that have exercises in this specific schema
         // since we are using INNER JOIN.
         // TODO: display the count of exercises for each category.
@@ -53,7 +53,7 @@ public class IndexModel(DapperContext context) : PageModel
     //     if (string.IsNullOrWhiteSpace(newCategoryName))
     //         return BadRequest();
 
-    //     using var connection = context.CreateConnection();
+    //     using var connection = ctx.CreateConnection();
     //     connection.Open();
     //     using (var trans = connection.BeginTransaction())
     //     {

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace SqlExercises.Razor.ViewComponents;
 
-public class CategoryDropdownViewComponent(DapperContext context) : ViewComponent
+public class CategoryDropdownViewComponent(AppDapperContext ctx) : ViewComponent
 {
     public async Task<IViewComponentResult> InvokeAsync()
     {
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = "SELECT name FROM category";
         var categories = await connection.QueryAsync<string>(sql);
 

@@ -1,24 +1,24 @@
 namespace SqlExercises.Razor;
 
 // * This will be used for everything else.
-public record ConnectionString(string Value)
+public record DefaultConnectionString(string Value)
 {
-    public static implicit operator string(ConnectionString c) => c.Value;
+    public static implicit operator string(DefaultConnectionString c) => c.Value;
 
-    public static implicit operator ConnectionString(string s) => new(s);
+    public static implicit operator DefaultConnectionString(string s) => new(s);
 }
 
-// * This will be used only to run user submitted solutions.
-public record SolutionConnectionString
+// * This will be used only to run user submitted sql.
+public record SchemaConnectionString
 {
     public string Value { get; set; }
 
-    public SolutionConnectionString(string value)
+    public SchemaConnectionString(string value)
     {
         Value = value;
     }
 
-    public static implicit operator string(SolutionConnectionString c) => c.Value;
+    public static implicit operator string(SchemaConnectionString c) => c.Value;
 
-    public static implicit operator SolutionConnectionString(string s) => new(s);
+    public static implicit operator SchemaConnectionString(string s) => new(s);
 }

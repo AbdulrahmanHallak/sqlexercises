@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
-public class CreateModel(DapperContext context) : PageModel
+public class CreateModel(AppDapperContext ctx) : PageModel
 {
     [BindProperty]
     public ExerciseDto Exercise { get; set; } = default!;
@@ -25,7 +25,7 @@ public class CreateModel(DapperContext context) : PageModel
                 SELECT (SELECT id FROM category WHERE name iLIKE @category) AS category_id,
                 (SELECT id FROM user_schema WHERE short_name iLIKE @schema) AS schema_id
             """;
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         (var categoryId, var schemaId) = await connection.QueryFirstAsync<(
             int? CategoryId,
             int? SchemaId
@@ -44,7 +44,7 @@ public class CreateModel(DapperContext context) : PageModel
         if (!ModelState.IsValid)
             return Page();
 
-        using (var connection = context.CreateConnection())
+        using (var connection = ctx.CreateConnection())
         {
             var sql = """
                 INSERT INTO exercise (title, question, solution, explanation, hint, category_id, user_schema_id)
@@ -53,6 +53,7 @@ public class CreateModel(DapperContext context) : PageModel
             await connection.ExecuteAsync(sql, Exercise);
         }
 
+        // todo: use query single to get the id and redirect to the exercise page instead of the index.
         return RedirectToPage("./Index", new { category = Category });
     }
 
