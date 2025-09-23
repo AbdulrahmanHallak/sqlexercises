@@ -1,12 +1,17 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Npgsql;
 using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas;
 
 [SearchPath]
-public class PlaygroundModel(ILogger<PlaygroundModel> logger, DapperContext context) : PageModel
+public class PlaygroundModel(
+    ILogger<PlaygroundModel> logger,
+    AppDapperContext defaultCtx,
+    UserDapperContext schemaCtx
+) : PageModel
 {
     [BindProperty]
     public string Sql { get; set; } = string.Empty;
@@ -16,7 +21,7 @@ public class PlaygroundModel(ILogger<PlaygroundModel> logger, DapperContext cont
 
     public async Task<IActionResult> OnGet()
     {
-        using var connection = context.CreateConnection();
+        using var connection = defaultCtx.CreateConnection();
         var sql = "SELECT EXISTS(SELECT 1 FROM user_schema WHERE short_name iLIKE @schema)";
         var schemaExists = await connection.QuerySingleAsync<bool>(sql, new { Schema });
         if (!schemaExists)
@@ -31,13 +36,17 @@ public class PlaygroundModel(ILogger<PlaygroundModel> logger, DapperContext cont
             if (string.IsNullOrWhiteSpace(Sql))
                 return new JsonResult(new SqlResult { Results = [], Error = "No SQL provided" });
 
+            var isValid = ValidSql.TryCreate(Sql, out var validSql);
+            if (!isValid)
+                return new JsonResult(new SqlResult { Results = [], Error = "not allowed sql" });
+
             logger.LogInformation("Executing sql on schema {schema}:\n{sql}", Sql, Schema);
 
-            using var connection = context.CreateSolutionConnection();
+            using var connection = schemaCtx.CreateConnection(Schema);
             var results = (await connection.QueryAsync(Sql)).ToArray();
             return new JsonResult(new SqlResult { Results = results });
         }
-        catch (Exception ex)
+        catch (PostgresException ex)
         {
             logger.LogInformation(
                 "sql error on {Schema}:\n{Exception}:{Message}",

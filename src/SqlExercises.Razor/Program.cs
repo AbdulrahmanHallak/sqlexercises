@@ -47,10 +47,11 @@ try
         )
         .SetApplicationName("MyApp");
 
-    builder.Services.AddSingleton(_ => new ConnectionString(connString));
+    builder.Services.AddSingleton(_ => new DefaultConnectionString(connString));
     builder.Services.AddSingleton<SolutionChecker>();
-    builder.Services.AddScoped<DapperContext>();
-    builder.Services.AddScoped(_ => new SolutionConnectionString(solutionString));
+    builder.Services.AddScoped<AppDapperContext>();
+    builder.Services.AddScoped<UserDapperContext>();
+    builder.Services.AddScoped(_ => new SchemaConnectionString(solutionString));
     builder.Services.RegisterFluentMigrator(connString);
     builder.Services.AddScoped<SearchPathFilter>();
     builder.Services.AddScoped<UserSqlRunner>();

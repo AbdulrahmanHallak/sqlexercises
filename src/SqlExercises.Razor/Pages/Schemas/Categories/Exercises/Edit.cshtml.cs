@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
-public class EditModel(DapperContext context) : PageModel
+public class EditModel(AppDapperContext ctx) : PageModel
 {
     [BindProperty]
     public ExerciseDto Exercise { get; set; } = new();
@@ -24,7 +24,7 @@ public class EditModel(DapperContext context) : PageModel
         if (string.IsNullOrWhiteSpace(Category) || string.IsNullOrWhiteSpace(Schema))
             return NotFound();
 
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = """
             SELECT ex.id, ex.title, ex.question, ex.solution, ex.explanation, ex.hint, ex.category_id
             FROM exercise ex
@@ -58,7 +58,7 @@ public class EditModel(DapperContext context) : PageModel
         if (!ModelState.IsValid)
             return Page();
 
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = """
             UPDATE exercise SET
                 title = @Title,

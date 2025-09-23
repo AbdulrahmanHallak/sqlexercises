@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 
-public class DeleteModel(DapperContext context) : PageModel
+public class DeleteModel(AppDapperContext ctx) : PageModel
 {
     public ExerciseDto Exercise { get; set; } = default!;
 
@@ -17,7 +17,7 @@ public class DeleteModel(DapperContext context) : PageModel
     public async Task<IActionResult> OnGetAsync(int id)
     {
         // TODO: implement security checks and soft deletes.
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = """
             SELECT ex.id, ex.question, cat.name AS CategoryName, us.short_name AS SchemaName
             FROM exercise ex
@@ -46,7 +46,7 @@ public class DeleteModel(DapperContext context) : PageModel
 
     public async Task<IActionResult> OnPostAsync(int id)
     {
-        using var connection = context.CreateConnection();
+        using var connection = ctx.CreateConnection();
         var sql = "DELETE FROM exercise WHERE id = @id;";
         await connection.ExecuteAsync(sql, new { id });
         return RedirectToPage("./Index", new { Category, Schema });

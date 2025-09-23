@@ -10,7 +10,7 @@ public class SearchPathAttribute : ServiceFilterAttribute
         : base(typeof(SearchPathFilter)) { }
 }
 
-public class SearchPathFilter(SolutionConnectionString connectionString) : IPageFilter
+public class SearchPathFilter(SchemaConnectionString connectionString) : IPageFilter
 {
     public void OnPageHandlerExecuted(PageHandlerExecutedContext context) { }
 

@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Npgsql;
 using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
@@ -9,7 +10,8 @@ namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
 [SearchPath]
 public class ExerciseModel(
     ILogger<ExerciseModel> logger,
-    DapperContext context,
+    AppDapperContext ctx,
+    UserDapperContext schemaCtx,
     SolutionChecker checker
 ) : PageModel
 {
@@ -20,12 +22,15 @@ public class ExerciseModel(
     [BindProperty(SupportsGet = true)]
     public string Category { get; set; } = default!;
 
+    [BindProperty(SupportsGet = true)]
+    public string Schema { get; set; } = default!;
+
     public ExerciseDto Exercise { get; set; } = default!;
     public List<Dictionary<string, object>> ExpectedResult { get; set; } = default!;
 
     public async Task<IActionResult> OnGet()
     {
-        using (var connection = context.CreateConnection())
+        using (var connection = ctx.CreateConnection())
         {
             var sql = """
                     SELECT id, question, explanation, hint, solution, title
@@ -37,7 +42,7 @@ public class ExerciseModel(
                 return NotFound();
             Exercise = result;
         }
-        using var solutionConnection = context.CreateSolutionConnection();
+        using var solutionConnection = schemaCtx.CreateConnection(Schema);
 
         var expectedResults = await solutionConnection.QueryAsync(Exercise.Solution);
         var typeSafe = expectedResults
@@ -52,27 +57,34 @@ public class ExerciseModel(
     {
         // TODO: fix duplicate column name.
         // TODO: refactor into service class to simplify controller.
+        // TODO: see if you can make the await at the end of the methods.
         if (postedSolution is null)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
+        var isValid = ValidSql.TryCreate(postedSolution, out var validSql);
+        if (!isValid)
+            return new JsonResult(new { Result = "restricted sql.", Error = "not allowed sql" });
+
         string solution;
-        using (var connection = context.CreateConnection())
+        using (var connection = ctx.CreateConnection())
         {
             var sql = "SELECT solution FROM exercise WHERE id = @id";
             solution = await connection.QuerySingleAsync<string>(sql, new { id = Id });
         }
 
-        using var solutionConnection = context.CreateSolutionConnection();
+        using var solConnection = schemaCtx.CreateConnection(Schema);
+        solConnection.Open();
+        using var transaction = solConnection.BeginTransaction(IsolationLevel.ReadCommitted);
 
-        IEnumerable<dynamic> solutionResult = await solutionConnection.QueryAsync(solution);
+        IEnumerable<dynamic> solutionResult = await solConnection.QueryAsync(solution);
 
         IEnumerable<dynamic> resultRows;
         try
         {
             logger.LogInformation("Executing sql solution:\n{solution}", postedSolution);
-            resultRows = await solutionConnection.QueryAsync(postedSolution);
+            resultRows = await solConnection.QueryAsync(postedSolution);
         }
-        catch (Exception ex)
+        catch (PostgresException ex)
         {
             logger.LogInformation(
                 "sql solution error for exercise {ExerciseId}:\n{Exception}:{Message}",
