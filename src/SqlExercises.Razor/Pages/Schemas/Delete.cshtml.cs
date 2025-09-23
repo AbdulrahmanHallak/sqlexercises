@@ -3,7 +3,7 @@ using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace SqlExercises.Razor.Pages.Schemas;
+// namespace SqlExercises.Razor.Pages.Schemas;
 
 // public class DeleteModel(DapperContext context) : PageModel
 // {
