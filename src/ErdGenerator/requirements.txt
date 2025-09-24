@@ -1,0 +1,4 @@
+eralchemy2
+SQLAlchemy
+psycopg2-binary
+sqlalchemy-utils

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace SqlExercises.Razor.Pages.Schemas;
 
-public class CreateModel(UserSqlRunner runner) : PageModel
+public class CreateModel(UserSqlRunner runner, IErdGenerator erdGen) : PageModel
 {
     [BindProperty]
     public SchemaDto Schema { get; set; } = default!;
@@ -29,6 +29,7 @@ public class CreateModel(UserSqlRunner runner) : PageModel
             ModelState.AddModelError(string.Empty, error!);
             return Page();
         }
+        erdGen.GenerateErd(Schema.ShortName);
 
         return RedirectToPage("Edit", new { schema = Schema.ShortName });
     }

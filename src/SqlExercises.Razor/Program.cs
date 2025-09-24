@@ -27,6 +27,10 @@ try
         builder.Configuration.GetConnectionString("Postgres:Solution")
         ?? throw new InvalidOperationException("Connection string cannot be null");
 
+    var pythonConnString =
+        builder.Configuration.GetConnectionString("python")
+        ?? throw new InvalidOperationException("Connection string cannot be null");
+
     builder.Services.Configure<RouteOptions>(opts =>
     {
         opts.LowercaseQueryStrings = true;
@@ -48,7 +52,10 @@ try
         .SetApplicationName("MyApp");
 
     builder.Services.AddSingleton(_ => new DefaultConnectionString(connString));
+    builder.Services.AddSingleton(_ => new PythonConnectionString(pythonConnString));
     builder.Services.AddSingleton<SolutionChecker>();
+    builder.Services.AddSingleton<IErdGenerator, ErdGenerator>();
+
     builder.Services.AddScoped<AppDapperContext>();
     builder.Services.AddScoped<UserDapperContext>();
     builder.Services.AddScoped(_ => new SchemaConnectionString(solutionString));
