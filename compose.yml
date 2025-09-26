@@ -1,9 +1,10 @@
 services:
   sqlexercises:
     image: sqlexercises
+    container_name: sqlexercises-razor
     build:
       context: .
-      dockerfile: ./src/SqlExercises.Razor/Dockerfile
+      dockerfile: ./src/Dockerfile
       args:
         UID: ${UID}
 
@@ -11,22 +12,22 @@ services:
       - 8080:8080
 
     networks:
-      - wrattel
+      - sqlexercises
     volumes:
       - ${HOME}/.aspnet/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
 
   db:
     image: postgres:15-alpine
-    container_name: wrattel-db
+    container_name: sqlexercises-db
     ports:
       - 3030:5432
     volumes:
-      - wrattel-db:/var/lib/postgresql/data
+      - sqlexercises-data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=wrattel
+      - POSTGRES_DB=sqlexercises
       - POSTGRES_PASSWORD=tls123dks
     networks:
-      - wrattel
+      - sqlexercises
 
   seq:
     image: datalust/seq:latest
@@ -39,15 +40,15 @@ services:
     volumes:
       - seq-data:/data
     networks:
-      - wrattel
+      - sqlexercises
 
 networks:
-  wrattel:
-    name: wrattel-network
+  sqlexercises:
+    name: sqlexercises-network
     driver: bridge
 
 volumes:
-  wrattel-db:
-    name: wrattel-data
+  sqlexercises-data:
+    name: sqlexercises-data
   seq-data:
     name: seq-data
