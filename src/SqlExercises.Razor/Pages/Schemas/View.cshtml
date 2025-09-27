@@ -31,7 +31,8 @@ else
 }
 
 <a asp-page="../Index" class="btn btn-secondary mt-3">Back to Schemas</a>
-<a asp-page="./Playground" class="btn btn-info mt-3 ms-2">Go to Playground</a>
+<a asp-page="./Playground" asp-route-schema="@Model.Schema.ShortName" class="btn btn-info mt-3 ms-2">Go to
+    Playground</a>
 <a asp-page="./Edit" asp-route-schema="@Model.Schema.ShortName" class="btn btn-info mt-3 ms-2">Go to Edit</a>
 <a asp-page="./Exercises/Create" asp-route-schema="@Model.Schema.ShortName" class="btn btn-success mt-3 ms-2">Create
     Exercise</a>
