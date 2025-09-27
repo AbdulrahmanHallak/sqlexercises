@@ -1,7 +1,7 @@
 using System.Text;
 using K4os.Hash.xxHash;
 
-namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
+namespace SqlExercises.Razor.Pages.Schemas.Exercises;
 
 public class SolutionChecker
 {
