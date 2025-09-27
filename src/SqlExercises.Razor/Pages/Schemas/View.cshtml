@@ -1,0 +1,37 @@
+@page "/schemas/{schema:alpha}"
+@model ViewModel
+@{
+    ViewData["Title"] = $"Schema Details - {Model.Schema.SchemaName}";
+}
+
+<h2>Schema: @Model.Schema.SchemaName</h2>
+<div class="mb-3">
+    <strong>Description:</strong> <span class="text-muted">No description</span>
+</div>
+
+@if (Model.Categories.Any())
+{
+    <h3>Categories</h3>
+    <ul class="list-group">
+        @foreach (var cat in Model.Categories)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@cat.Name</span>
+                <span>
+                    <a asp-page="./Exercises/Index" asp-route-schema="@Model.Schema.ShortName" asp-route-category="@cat.Name"
+                        class="btn btn-sm btn-primary">View Exercises</a>
+                </span>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <div class="alert alert-info">This schema has no exercises yet.</div>
+}
+
+<a asp-page="../Index" class="btn btn-secondary mt-3">Back to Schemas</a>
+<a asp-page="./Playground" class="btn btn-info mt-3 ms-2">Go to Playground</a>
+<a asp-page="./Edit" asp-route-schema="@Model.Schema.ShortName" class="btn btn-info mt-3 ms-2">Go to Edit</a>
+<a asp-page="./Exercises/Create" asp-route-schema="@Model.Schema.ShortName" class="btn btn-success mt-3 ms-2">Create
+    Exercise</a>

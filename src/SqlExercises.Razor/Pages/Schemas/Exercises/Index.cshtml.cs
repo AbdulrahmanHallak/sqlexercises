@@ -1,10 +1,11 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Npgsql;
 
-namespace SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
+namespace SqlExercises.Razor.Pages.Schemas.Exercises;
 
-public class ExercisesModel(AppDapperContext ctx) : PageModel
+public class IndexModel(AppDapperContext ctx) : PageModel
 {
     [BindProperty(SupportsGet = true)]
     public string? Schema { get; set; }
@@ -12,13 +13,10 @@ public class ExercisesModel(AppDapperContext ctx) : PageModel
     [BindProperty(SupportsGet = true)]
     public string? Category { get; set; }
 
-    public IReadOnlyCollection<ExerciseDto> Exercises { get; set; } = default!;
+    public IReadOnlyCollection<ExerciseDto> Exercises { get; set; } = null!;
 
     public async Task<IActionResult> OnGet()
     {
-        if (Category is null || Schema is null)
-            return NotFound();
-
         using var connection = ctx.CreateConnection();
         var sql = """
                 SELECT ex.id, ex.Title
@@ -27,10 +25,19 @@ public class ExercisesModel(AppDapperContext ctx) : PageModel
                   ON cat.id = ex.category_id
                 INNER JOIN user_schema us
                   ON us.id = ex.user_schema_id
-                WHERE cat.name iLIKE @category AND us.short_name iLIKE @schema
-                ORDER BY 1
+                WHERE us.short_name iLIKE @schema
+                  AND cat.name iLIKE @category
             """;
-        var exercises = await connection.QueryAsync<ExerciseDto>(sql, new { Category, Schema });
+        var param = new DynamicParameters();
+        param.Add("schema", Schema);
+        if (!string.IsNullOrWhiteSpace(Category))
+        {
+            sql += " AND cat.name iLIKE @category";
+            param.Add("category", Category);
+        }
+        sql += " ORDER BY 1";
+
+        var exercises = await connection.QueryAsync<ExerciseDto>(sql, param: param);
         Exercises = [.. exercises];
         return Page();
     }
@@ -38,6 +45,6 @@ public class ExercisesModel(AppDapperContext ctx) : PageModel
     public class ExerciseDto
     {
         public int Id { get; set; }
-        public string Title { get; set; } = default!;
+        public string Title { get; set; } = null!;
     }
 }

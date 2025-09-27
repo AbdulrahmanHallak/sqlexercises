@@ -4,7 +4,7 @@ using Serilog;
 using SqlExercises.Db;
 using SqlExercises.Razor;
 using SqlExercises.Razor.Pages.Schemas;
-using SqlExercises.Razor.Pages.Schemas.Categories.Exercises;
+using SqlExercises.Razor.Pages.Schemas.Exercises;
 using SqlExercises.Razor.Pages.Shared.Filters;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
@@ -28,7 +28,7 @@ try
         ?? throw new InvalidOperationException("Connection string cannot be null");
 
     var pythonConnString =
-        builder.Configuration.GetConnectionString("python")
+        builder.Configuration.GetConnectionString("Postgres:Python")
         ?? throw new InvalidOperationException("Connection string cannot be null");
 
     builder.Services.Configure<RouteOptions>(opts =>
@@ -82,6 +82,7 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseStaticFiles();
 
     app.UseRouting();
 
