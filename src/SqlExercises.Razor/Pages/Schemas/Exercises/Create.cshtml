@@ -1,49 +1,59 @@
-@page "/Schemas/{schema:alpha}/Categories/{category:alpha}/Exercises/{id:int}/Edit"
-@model EditModel
+﻿@page "/schemas/{schema:alpha}/Exercises/Create"
+@model CreateModel
 @{
-    ViewData["Title"] = "Edit Exercise";
+    ViewData["Title"] = "Create Exercise";
 }
-<h2>Edit Exercise</h2>
+<h2>Create Exercise</h2>
 <form method="post">
-    <input type="hidden" asp-for="Exercise.Id" />
     <div class="mb-3">
         <label asp-for="Exercise.Title" class="form-label"></label>
-        <textarea asp-for="Exercise.Title" class="form-control"></textarea>
+        <input asp-for="Exercise.Title" class="form-control" />
         <span asp-validation-for="Exercise.Title" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="Exercise.CategoryId" class="form-label">Category</label>
-        <select asp-for="Exercise.CategoryId" asp-items="Model.Categories" class="form-select">
-        </select>
-        <span asp-validation-for="Exercise.CategoryId" class="text-danger"></span>
-    </div>
+
     <div class="mb-3">
         <label asp-for="Exercise.Question" class="form-label"></label>
         <textarea asp-for="Exercise.Question" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Question" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Exercise.Solution" class="form-label"></label>
         <textarea asp-for="Exercise.Solution" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Solution" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Exercise.Explanation" class="form-label"></label>
         <textarea asp-for="Exercise.Explanation" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Explanation" class="text-danger"></span>
     </div>
+
     <div class="mb-3">
         <label asp-for="Exercise.Hint" class="form-label"></label>
         <textarea asp-for="Exercise.Hint" class="form-control"></textarea>
         <span asp-validation-for="Exercise.Hint" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    @* //TODO: *@
-    @* <a asp-page="/Categories/Exercises/Index" *@
-        @* asp-route-category="@(Model.Category ?? Model.Exercise?.CategoryId.ToString() ?? RouteData.Values["category"]?.ToString())" *@
-        @* class="btn btn-secondary">Cancel</a> *@
+    <!-- Category Dropdown + New Category -->
+    <div class="mb-3">
+        <label asp-for="Exercise.CategoryId" class="form-label">Category</label>
+        <select asp-for="Exercise.CategoryId" asp-items="Model.Categories" class="form-select">
+            <option value="">-- Select Category --</option>
+        </select>
+        <span asp-validation-for="Exercise.CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="NewCategoryName" class="form-label">Or Create New Category</label>
+        <input asp-for="NewCategoryName" class="form-control" placeholder="New category name" />
+        <span asp-validation-for="NewCategoryName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-page="./Index" asp-route-schema="@Model.Schema" class="btn btn-secondary">Cancel</a>
 </form>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

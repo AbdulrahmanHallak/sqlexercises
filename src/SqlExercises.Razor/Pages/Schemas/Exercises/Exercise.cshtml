@@ -1,4 +1,4 @@
-@page "/Schemas/{schema:alpha}/Categories/{category:alpha}/Exercises/{id:int}"
+@page "/schemas/{schema:alpha}/Exercises/{id:int}"
 @model ExerciseModel
 @{
     ViewData["Title"] = "Exercise";
@@ -140,7 +140,8 @@
                 formData.append('PostedSolution', sql);
                 const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
                 formData.append('__RequestVerificationToken', token);
-                const response = await fetch(window.location.pathname, {
+                const response = await fetch(window.location.pathname + window.location.search, {
+
                     method: 'POST',
                     body: formData
                 });
