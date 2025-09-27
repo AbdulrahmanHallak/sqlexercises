@@ -17,7 +17,7 @@ public class PlaygroundModel(
     public string Sql { get; set; } = string.Empty;
 
     [BindProperty(SupportsGet = true)]
-    public string Schema { get; set; } = default!;
+    public string Schema { get; set; } = null!;
 
     public async Task<IActionResult> OnGet()
     {
@@ -43,12 +43,11 @@ public class PlaygroundModel(
             logger.LogInformation("Executing sql on schema {schema}:\n{sql}", Sql, Schema);
             var results = await runner.QueryReadOnly(
                 Schema,
-                Sql,
+                validSql!,
                 async (connection, transaction, sql) =>
-                {
-                    return await connection.QueryAsync(sql);
-                }
+                    await connection.QueryAsync(sql, transaction: transaction)
             );
+
             return new JsonResult(new SqlResult { Results = [.. results] });
         }
         catch (PostgresException ex)
@@ -65,7 +64,7 @@ public class PlaygroundModel(
 
     public class SqlResult
     {
-        public object[] Results { get; set; } = default!;
+        public object[] Results { get; set; } = null!;
         public string? Error { get; set; }
     }
 }

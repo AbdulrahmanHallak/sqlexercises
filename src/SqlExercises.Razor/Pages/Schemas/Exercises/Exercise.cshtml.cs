@@ -75,14 +75,12 @@ public class ExerciseModel(
 
     public async Task<IActionResult> OnPost(string? postedSolution)
     {
-        // TODO: refactor into service class to simplify controller.
-        // TODO: see if you can make the await at the end of the methods.
         if (postedSolution is null)
             return new JsonResult(new { result = "No solution provided.", isEqual = false });
 
         var isValid = ValidSql.TryCreate(postedSolution, out var solutionSql);
         if (!isValid)
-            return new JsonResult(new { Result = "restricted sql.", Error = "not allowed sql" });
+            return new JsonResult(new { result = "restricted sql.", isEqual = false });
 
         string? solution;
         using (var connection = ctx.CreateConnection())
@@ -109,40 +107,32 @@ public class ExerciseModel(
                 }
             );
             if (solution is null)
-                return NotFound();
+                return new JsonResult(
+                    new { result = "No expected solution found.", isEqual = false }
+                );
         }
 
         IEnumerable<dynamic> solutionResult = await runner.QueryReadOnly(
             Schema,
             solution,
-            async (connection, transaction, sql) =>
-                await connection.QueryAsync(sql, transaction: transaction)
+            async (conn, tx, sql) => await conn.QueryAsync(sql, transaction: tx)
         );
 
         IEnumerable<dynamic> resultRows;
         try
         {
-            logger.LogInformation("Executing sql solution:\n{solution}", solutionSql!);
             resultRows = await runner.QueryReadOnly(
                 Schema,
                 solutionSql!,
-                async (connection, transaction, sql) =>
-                    await connection.QueryAsync(sql, transaction: transaction)
+                async (conn, tx, sql) => await conn.QueryAsync(sql, transaction: tx)
             );
         }
         catch (PostgresException ex)
         {
-            logger.LogInformation(
-                "sql solution error for exercise {ExerciseId}:\n{Exception}:{Message}",
-                ex,
-                ex.Message,
-                Id
-            );
-            return new JsonResult(new { result = ex.Message, isEqual = false });
+            return new JsonResult(new { result = $"ERROR: {ex.Message}", isEqual = false });
         }
 
         var isEqual = checker.IsCorrect([.. resultRows], [.. solutionResult]);
-
         return new JsonResult(new { result = resultRows, isEqual });
     }
 
