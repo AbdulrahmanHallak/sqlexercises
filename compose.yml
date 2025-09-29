@@ -3,10 +3,12 @@ services:
     image: sqlexercises
     container_name: sqlexercises-razor
     build:
-      context: .
-      dockerfile: ./src/Dockerfile
+      context: ./src/
+      dockerfile: Dockerfile
       args:
         UID: ${UID}
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
 
     ports:
       - 8080:8080
@@ -26,8 +28,13 @@ services:
     environment:
       - POSTGRES_DB=sqlexercises
       - POSTGRES_PASSWORD=tls123dks
+      - POSTGRES_USER=postgres
     networks:
       - sqlexercises
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      retries: 5
 
   seq:
     image: datalust/seq:latest

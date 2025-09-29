@@ -35,29 +35,25 @@ ARG configuration=Release
 RUN dotnet publish ${web_proj}/${web_proj}.csproj -c $configuration -o /app/publish /p:UseAppHost=false
 
 
-FROM base AS py-build
+FROM base AS final
 USER root
 WORKDIR /src/ErdGenerator
-COPY ErdGenerator/requirements.txt ./
 
-RUN python3 -m venv /venv \
-    && . /venv/bin/activate \
-    && apt-get update \
+COPY ErdGenerator/ ./
+RUN chown -R app:app /src
+
+RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     build-essential libgraphviz-dev pkg-config python3-dev \
-    && pip install --upgrade pip \
-    && pip install -r requirements.txt \
+    && pip install --break-system-packages --upgrade pip \
+    && pip install --no-cache-dir --break-system-packages -r requirements.txt \
     && apt-get purge -y --auto-remove build-essential libgraphviz-dev pkg-config python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ErdGenerator/ .
-
-
-FROM base AS final
 WORKDIR /app
-
 COPY --from=publish /app/publish .
-COPY --from=py-build /venv /venv
-COPY --from=py-build /src/ErdGenerator /src/ErdGenerator
+RUN chown -R app:app /app
+
+USER app
 
 ENTRYPOINT ["dotnet", "SqlExercises.Razor.dll"]
