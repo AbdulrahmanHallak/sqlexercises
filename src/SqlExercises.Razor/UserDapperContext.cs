@@ -9,6 +9,7 @@ public class UserDapperContext(SchemaConnectionString connString)
     public IDbConnection CreateConnection(string schemaShortName)
     {
         var connection = new NpgsqlConnection(connString);
+        connection.Open();
         connection.Execute(
             $"""
                 SET search_path =  {schemaShortName};
