@@ -17,6 +17,8 @@ services:
       - sqlexercises
     volumes:
       - ${HOME}/.aspnet/DataProtection-Keys:/home/app/.aspnet/DataProtection-Keys
+    depends_on:
+      - pgbouncer
 
   db:
     image: postgres:15-alpine
@@ -32,9 +34,26 @@ services:
     networks:
       - sqlexercises
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       retries: 5
+
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    container_name: sqlexercises-pgbouncer
+    volumes:
+      - ${HOME}/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ${HOME}/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+
+    ports:
+      - "6432:6432"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - sqlexercises
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost"]
 
   seq:
     image: datalust/seq:latest
