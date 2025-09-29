@@ -89,7 +89,7 @@ public class UserSqlRunner(
                 );
             }
             // TODO: see if you can inherit from npgsql connection to make a constructor that accepts the connection string type
-            return (true, default);
+            return (true, null);
         }
     }
 
@@ -129,9 +129,11 @@ public class UserSqlRunner(
     )
     {
         using var connection = schemaCtx.CreateConnection(schemaShortName);
-        connection.Open();
         using var transaction = connection.BeginTransaction();
-        await connection.ExecuteAsync("SET TRANSACTION READ ONLY", transaction: transaction);
+        await connection.ExecuteAsync(
+            "SET statement_timeout = '5s'; SET TRANSACTION READ ONLY;",
+            transaction: transaction
+        );
 
         IEnumerable<T>? result;
         try
