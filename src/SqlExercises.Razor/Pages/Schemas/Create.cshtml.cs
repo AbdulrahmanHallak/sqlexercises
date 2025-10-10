@@ -7,7 +7,7 @@ namespace SqlExercises.Razor.Pages.Schemas;
 public class CreateModel(UserSqlRunner runner, IErdGenerator erdGen) : PageModel
 {
     [BindProperty]
-    public SchemaDto Schema { get; set; } = default!;
+    public SchemaDto Schema { get; set; } = null!;
 
     public IActionResult OnGetAsync()
     {
@@ -46,14 +46,14 @@ public class CreateModel(UserSqlRunner runner, IErdGenerator erdGen) : PageModel
             @"^[a-zA-Z0-9_\-\s]+$",
             ErrorMessage = "Only letters, numbers, underscores, dashes, and spaces are allowed"
         )]
-        public string Name { get; set; } = default!;
+        public string Name { get; set; } = null!;
 
-        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "only letters are allowed")]
+        [RegularExpression("^[a-zA-Z]+$", ErrorMessage = "only letters are allowed")]
         [StringLength(10, MinimumLength = 3)]
         [Required]
-        public string ShortName { get; set; } = default!;
+        public string ShortName { get; set; } = null!;
 
         [Required]
-        public string CreateStatements { get; set; } = default!;
+        public string CreateStatements { get; set; } = null!;
     }
 }

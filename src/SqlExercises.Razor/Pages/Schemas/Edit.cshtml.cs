@@ -8,10 +8,10 @@ namespace SqlExercises.Razor.Pages.Schemas;
 public class EditModel(AppDapperContext ctx, UserSqlRunner runner) : PageModel
 {
     [BindProperty(SupportsGet = true)]
-    public string Schema { get; set; } = default!;
+    public string Schema { get; set; } = null!;
 
     [BindProperty]
-    public EditSchemaDto EditSchema { get; set; } = default!;
+    public EditSchemaDto EditSchema { get; set; } = null!;
 
     public async Task<IActionResult> OnGet()
     {
@@ -72,7 +72,7 @@ public class EditModel(AppDapperContext ctx, UserSqlRunner runner) : PageModel
             @"^[a-zA-Z0-9_\-\s]+$",
             ErrorMessage = "Only letters, numbers, underscores, dashes, and spaces are allowed"
         )]
-        public string Name { get; set; } = default!;
+        public string Name { get; set; } = null!;
 
         public string? Sql { get; set; }
     }
