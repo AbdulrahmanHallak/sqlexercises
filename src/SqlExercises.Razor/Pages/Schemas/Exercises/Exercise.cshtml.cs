@@ -1,19 +1,12 @@
-using System.Data;
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
-using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas.Exercises;
 
-[SearchPath]
-public class ExerciseModel(
-    ILogger<ExerciseModel> logger,
-    AppDapperContext ctx,
-    UserSqlRunner runner,
-    SolutionChecker checker
-) : PageModel
+public class ExerciseModel(AppDapperContext ctx, UserSqlRunner runner, SolutionChecker checker)
+    : PageModel
 {
     // For GET
     [BindProperty(SupportsGet = true)]
@@ -118,21 +111,24 @@ public class ExerciseModel(
             async (conn, tx, sql) => await conn.QueryAsync(sql, transaction: tx)
         );
 
-        IEnumerable<dynamic> resultRows;
+        dynamic[] resultRows;
         try
         {
-            resultRows = await runner.QueryReadOnly(
-                Schema,
-                solutionSql!,
-                async (conn, tx, sql) => await conn.QueryAsync(sql, transaction: tx)
-            );
+            resultRows =
+            [
+                .. await runner.QueryReadOnly(
+                    Schema,
+                    solutionSql!,
+                    async (conn, tx, sql) => await conn.QueryAsync(sql, transaction: tx)
+                ),
+            ];
         }
         catch (PostgresException ex)
         {
             return new JsonResult(new { result = $"ERROR: {ex.Message}", isEqual = false });
         }
 
-        var isEqual = checker.IsCorrect([.. resultRows], [.. solutionResult]);
+        var isEqual = checker.IsCorrect(resultRows, [.. solutionResult]);
         return new JsonResult(new { result = resultRows, isEqual });
     }
 

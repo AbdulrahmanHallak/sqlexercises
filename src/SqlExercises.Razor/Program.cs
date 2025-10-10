@@ -5,7 +5,6 @@ using SqlExercises.Db;
 using SqlExercises.Razor;
 using SqlExercises.Razor.Pages.Schemas;
 using SqlExercises.Razor.Pages.Schemas.Exercises;
-using SqlExercises.Razor.Pages.Shared.Filters;
 
 Log.Logger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
 try
@@ -51,16 +50,23 @@ try
         )
         .SetApplicationName("MyApp");
 
+    // TODO: edit two commit messages
+    // TODO: fix docker
+    // TODO:refactor
+    // TODO: add the ability to regenerate erd from edit
+    // TODO: add auth
+
+
+    // since there is no dynamic search_path manipulation.
     builder.Services.AddSingleton(_ => new DefaultConnectionString(connString));
     builder.Services.AddSingleton(_ => new PythonConnectionString(pythonConnString));
     builder.Services.AddSingleton<SolutionChecker>();
     builder.Services.AddSingleton<IErdGenerator, ErdGenerator>();
+    builder.Services.AddSingleton<AppDapperContext>();
 
-    builder.Services.AddScoped<AppDapperContext>();
     builder.Services.AddScoped<UserDapperContext>();
     builder.Services.AddScoped(_ => new SchemaConnectionString(solutionString));
     builder.Services.RegisterFluentMigrator(connString);
-    builder.Services.AddScoped<SearchPathFilter>();
     builder.Services.AddScoped<UserSqlRunner>();
 
     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;

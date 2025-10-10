@@ -1,12 +1,11 @@
 using Dapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Npgsql;
-using SqlExercises.Razor.Pages.Shared.Filters;
 
 namespace SqlExercises.Razor.Pages.Schemas;
 
-[SearchPath]
 public class PlaygroundModel(
     ILogger<PlaygroundModel> logger,
     AppDapperContext defaultCtx,
