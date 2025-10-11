@@ -1,24 +1,28 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
 EXPOSE 8080
 ENV ASPNETCORE_URLS=http://+:8080
-
 ARG UID=1000
 
-USER root
-# same userid across containers to persist data protection keys.
-RUN usermod -u $UID app \
-    && groupmod -g $UID app \
-    && chown -R $UID:$UID /home/app
+RUN deluser app \
+    && adduser -D -u $UID app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    python3 python3-venv python3-pip graphviz \
-    && rm -rf /var/lib/apt/lists/*
+WORKDIR /src/ErdGenerator
+COPY --chown=app:app ErdGenerator/requirements.txt .
 
-USER app
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    graphviz \
+    && apk add --no-cache --virtual .build-deps \
+    build-base \
+    graphviz-dev \
+    pkgconfig \
+    python3-dev \
+    && pip install --no-cache-dir --break-system-packages --upgrade pip \
+    && pip install --no-cache-dir --break-system-packages -r requirements.txt \
+    && apk del .build-deps
 
-
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 ARG web_proj=SqlExercises.Razor
 ARG db_proj=SqlExercises.Db
 
@@ -34,26 +38,12 @@ FROM build AS publish
 ARG configuration=Release
 RUN dotnet publish ${web_proj}/${web_proj}.csproj -c $configuration -o /app/publish /p:UseAppHost=false
 
-
 FROM base AS final
-USER root
-WORKDIR /src/ErdGenerator
-
-COPY ErdGenerator/ ./
-RUN chown -R app:app /src
-
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    build-essential libgraphviz-dev pkg-config python3-dev \
-    && pip install --break-system-packages --upgrade pip \
-    && pip install --no-cache-dir --break-system-packages -r requirements.txt \
-    && apt-get purge -y --auto-remove build-essential libgraphviz-dev pkg-config python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+COPY --chown=app:app ErdGenerator/ /src/ErdGenerator/
 
 WORKDIR /app
-COPY --from=publish /app/publish .
-RUN chown -R app:app /app
+COPY --from=publish --chown=app:app /app/publish .
 
 USER app
-
 ENTRYPOINT ["dotnet", "SqlExercises.Razor.dll"]
+
