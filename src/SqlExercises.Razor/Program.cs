@@ -1,5 +1,6 @@
 using FluentMigrator.Runner;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using SqlExercises.Db;
 using SqlExercises.Razor;
@@ -69,6 +70,8 @@ try
     builder.Services.RegisterFluentMigrator(connString);
     builder.Services.AddScoped<UserSqlRunner>();
 
+    builder.Services.AddHealthChecks();
+
     Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
     var app = builder.Build();
@@ -79,6 +82,12 @@ try
         runner.MigrateUp();
     }
 
+    app.UseForwardedHeaders(
+        new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto,
+        }
+    );
     // Configure the HTTP request pipeline.
     if (!app.Environment.IsDevelopment())
     {
@@ -96,6 +105,7 @@ try
 
     app.MapStaticAssets();
     app.MapRazorPages().WithStaticAssets();
+    app.MapHealthChecks("/health");
 
     app.Run();
 }

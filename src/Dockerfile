@@ -42,7 +42,12 @@ FROM base AS final
 COPY --chown=app:app ErdGenerator/ /src/ErdGenerator/
 
 WORKDIR /app
+HEALTHCHECK --interval=30s --timeout=30s --start-period=30s --retries=3 \
+    CMD wget --quiet --spider http://127.0.0.1:8080/health || exit 1
+
 COPY --from=publish --chown=app:app /app/publish .
+RUN chown -R app:app /app
+RUN chown -R app:app /src/ErdGenerator
 
 USER app
 ENTRYPOINT ["dotnet", "SqlExercises.Razor.dll"]
